@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Data Comparison Results{% endblock %}
+
+{% block styles %}
+<STYLE type="text/css"> 
+.mismatch { background-color:red; color:white; } 
+.ok { background-color:#33FF99; color:black; } 
+--> 
+</STYLE> 
+{% endblock %}
+
+{% block content %}
+<p>
+{{ content }}
+<table border="1">
+{% for row in table_rows %}
+<tr>
+	{% for cell in table_rows[loop.index] %}
+		<td class="{{ cell[1] }}">
+		{{ cell[0] }}
+		</td>
+	{% endfor %}
+</tr>
+{% endfor %}
+</table>
+</p>
+{% endblock %}
+

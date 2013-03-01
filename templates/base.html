@@ -2,8 +2,10 @@
 <html>
 
 <head> 
- <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>{% block title %}Add Title here{% endblock %}</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  {% block head %} {% endblock %}
+  {% block styles %} {% endblock %}
 </head>
 
 <body> 

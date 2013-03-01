@@ -115,28 +115,28 @@ def check_for_equal(item_1, item_2):
     return item_1 == item_2
 
 float_equivalence_tolerance = 1/float(pow(10, 10))
-print "Tolerance: %s" % float_equivalence_tolerance
+#print "Tolerance: %s" % float_equivalence_tolerance
 def check_for_float_equivalence(item_1, item_2):
     f_item1 = float(item_1)
     f_item2 = float(item_2)
     return abs(f_item1 - f_item2) < float_equivalence_tolerance
 
+def compare_tables(t1, t2, comparator):
+    diffs = {}
+    sames = {}
+    for row_index, (t1_row, t2_row) in enumerate(zip(t1, t2)):
+        for col_index, (t1_cell, t2_cell) in enumerate(zip(t1_row, t2_row)):
+##            print "C-%s:%s" % (row_index, col_index), t1_cell
+            if t1_cell != t2_cell:
+                diffs[(row_index, col_index)] = (t1_cell, t2_cell)
+            else:
+                sames[(row_index, col_index)] = t1_cell
+                
+    return diffs, sames
+
 if __name__ == "__main__":
-    f = open("int_data_Jan26-2012_daily_30_years_out_take2.txt")
-    f = open("3mo_libor_dec_30_prod.txt")
-    in_1 = f.read()
-    f.close()
-
-    f = open("prod_data_Jan26-2012_daily_30_years_out_take2.txt")
-    f = open("3mo_libor_dec_30_int.txt")
-    in_2 = f.read()
-    f.close()
-
-    print compare_tabular_inputs(in_1, in_2)
-    
-##    col_item_comparisons = {}    
-##    print compare_tabular_inputs(in_1, in_2, {"Date": check_for_equal,
-##                                              "Rate": check_for_equal,
-##                                              "Basis": check_for_equal,
-##                                              "DF": check_for_equal,
-##                                              })
+    t1 = [[str(i) for i in range(10)] for i in range(10)]
+    t2 = [[str(i) for i in range(10, 0, -1)] for i in range(10, 0, -1)]
+##    t2 = t1
+    diffs = compare_tables(t1, t2, None)
+    print diffs
