@@ -14,9 +14,23 @@
 <p>
 {{ content }}
 <table border="1">
+
+{% if options.show_row_col_labels %}
+<tr>
+<td/>
+{% for cell in table_rows[0] %}
+	<td>{{ loop.index }}</td>
+{% endfor %}
+</tr>
+{% endif %}
+
 {% for row in table_rows %}
 <tr>
-	{% for cell in table_rows[loop.index] %}
+	{% if options.show_row_col_labels %}
+		<td>{{ loop.index }}</td>
+	{% endif %}
+	
+	{% for cell in row %}
 		<td class="{{ cell[1] }}">
 		{{ cell[0] }}
 		</td>

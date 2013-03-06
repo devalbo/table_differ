@@ -3,6 +3,7 @@ import verify_lists as vl
 import compare_data
 import cPickle as pickle
 import uuid, os
+import td_config
 
 from flask import Flask
 from flask import render_template
@@ -64,9 +65,7 @@ def convert_data_to_table(table_data):
     grid_data = table_data['grid_data']
     row_count = int(table_data['row_count'])
     col_count = int(table_data['col_count'])
-    print row_count
-    print col_count
-    td = [[grid_data[i + (j * row_count)]
+    td = [[grid_data[i + (j * col_count)]
            for i in range(col_count)]
           for j in range(row_count)]
 
@@ -101,6 +100,7 @@ def tables_input():
 
 @app.route('/results/<results_id>', methods=['GET'])
 def show_results(results_id):
+    options = td_config.RenderTableOptions()
     results = pickle.load(open(os.path.join("compare_results",
                                             "%s.p" % results_id),
                                "rb"))
@@ -133,7 +133,8 @@ def show_results(results_id):
         table_rows.append(table_row)
 
     return render_template('data_comparison_results_handson.html',
-                           table_rows=table_rows)
+                           table_rows=table_rows,
+                           options=options)
 
 
 if __name__ == "__main__":
