@@ -4,6 +4,7 @@ import compare_data
 import cPickle as pickle
 import uuid, os
 import td_config
+import reverseproxied
 
 from flask import Flask
 from flask import render_template
@@ -12,6 +13,7 @@ from flask import url_for
 from flask import redirect
 import flask
 app = Flask(__name__)
+app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 @app.route('/')
 def index():
@@ -90,7 +92,6 @@ def tables_input():
                "t2_info": t2_info,
                "diffs": diffs,
                "sames": sames}
-##    print "Comparison results", diffs
     results_id = uuid.uuid4()
     pickle.dump(results, open(os.path.join("compare_results",
                                            "%s.p" % results_id),

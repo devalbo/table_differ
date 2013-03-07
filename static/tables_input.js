@@ -66,11 +66,8 @@ $('#compare').click(function() {
 		tableData[dataTableIds[td_index]] = thisTableData;
 	}
 	
-	//postData = {data: JSON.stringify(tableData), contentType: 'application/json'};
-	//post_to_url("/tables_input", JSON.stringify(tableData), "POST");
-
 	$.ajax({
-	  url: "/tables_input",
+	  url: "tables_input",
 	  data: JSON.stringify(tableData), //returns all cells' data
 	  dataType: 'json',
 	  contentType: 'application/json',
