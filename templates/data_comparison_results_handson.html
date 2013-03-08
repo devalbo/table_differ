@@ -13,6 +13,9 @@
 {% block content %}
 <p>
 {{ content }}
+<h1>
+<a href="{{ url_for('tables_input') }}">Back to comparison page</a>
+</h1>
 <table border="1">
 
 {% if options.show_row_col_labels %}
