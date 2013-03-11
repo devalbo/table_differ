@@ -14,9 +14,6 @@ import flask
 app = Flask(__name__)
 app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 def convert_data_to_table(table_data):
     grid_data = table_data['grid_data']
@@ -31,6 +28,10 @@ def convert_data_to_table(table_data):
     table_info["col_count"] = col_count
 
     return table_info, td
+
+@app.route('/')
+def index():
+    return tables_input()
 
 @app.route('/tables_input', methods=['GET', 'POST'])
 def tables_input():
