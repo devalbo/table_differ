@@ -9,6 +9,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 from flask import redirect
+from flask import Markup
 import flask
 
 app = Flask(__name__)
@@ -80,8 +81,8 @@ def show_results(results_id):
             if (row_index, col_index) in results["sames"]:
                 item = ("%s" % results["sames"][(row_index, col_index)], "ok")
             else:
-                item = ("Expected: %s --- Actual: %s" %
-                        results["diffs"][(row_index, col_index)],
+                item = (Markup("Expected: %s<br>Actual: %s" %
+                        results["diffs"][(row_index, col_index)]),
                         "mismatch")
                         
             table_row.append(item)
