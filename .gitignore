@@ -35,5 +35,6 @@ nosetests.xml
 .pydevproject
 
 # Directories
-venv/
-compare_results/
+table_differ/venv/
+table_differ/compare_results/
+.idea

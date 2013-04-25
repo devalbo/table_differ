@@ -2,6 +2,7 @@ import compare_data
 import cPickle as pickle
 import uuid, os
 import td_config
+import td_parsers
 import reverseproxied
 
 from flask import Flask
@@ -16,20 +17,6 @@ app = Flask(__name__)
 app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 
-def convert_data_to_table(table_data):
-    grid_data = table_data['grid_data']
-    row_count = int(table_data['row_count'])
-    col_count = int(table_data['col_count'])
-    td = [[grid_data[i + (j * col_count)]
-           for i in range(col_count)]
-          for j in range(row_count)]
-
-    table_info = {}
-    table_info["row_count"] = row_count
-    table_info["col_count"] = col_count
-
-    return table_info, td
-
 @app.route('/')
 def index():
     return tables_input()
@@ -39,10 +26,8 @@ def tables_input():
     if request.method == 'GET':
         return render_template('tables_input.html')
 
-    table1 = request.json['dataTable1']
-    table2 = request.json['dataTable2']
-    t1_info, table1 = convert_data_to_table(table1)
-    t2_info, table2 = convert_data_to_table(table2)
+    t1_info, table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
+    t2_info, table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
     diffs, sames = compare_data.compare_tables(table1, table2, None)
     results = {"t1_info": t1_info,
                "t2_info": t2_info,
@@ -73,7 +58,7 @@ def show_results(results_id):
         return "Error - different numbers of columns (%s / %s)" % (t1_col_count,
 
                                                                    t2_col_count)
-    
+
     table_rows = []
     for row_index in range(t1_row_count):
         table_row = []
@@ -82,9 +67,9 @@ def show_results(results_id):
                 item = ("%s" % results["sames"][(row_index, col_index)], "ok")
             else:
                 item = (Markup("Expected: %s<br>Actual: %s" %
-                        results["diffs"][(row_index, col_index)]),
+                               results["diffs"][(row_index, col_index)]),
                         "mismatch")
-                        
+
             table_row.append(item)
 
         table_rows.append(table_row)
