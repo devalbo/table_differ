@@ -8,7 +8,6 @@ import td_table
 def load_table_from_handson_json(handson_json):
     table_data = handson_json
     if type(table_data) is str:
-        print handson_json
         table_data = json.loads(handson_json)
 
     grid_data = table_data['grid_data']

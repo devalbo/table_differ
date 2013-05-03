@@ -1,0 +1,27 @@
+{% extends "new_base.html" %}
+
+{% block title %}Data Comparison{% endblock %}
+
+{% block head %}
+<script src="static/jquery.min.js"></script>
+<script src="static/jquery.handsontable.full.js"></script>
+<link rel="stylesheet" media="screen" href="static/jquery.handsontable.full.css">
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid" id="page-content">
+    <div class="row-fluid"> </div>
+    <div class="row-fluid"> </div>
+    <div class="row-fluid"> </div>
+    <div class="row-fluid">
+    Table of Expected Results
+    <div id="dataTable1" class="handsontable"></div>
+    Table of Actual Results
+    <div id="dataTable2" class="handsontable"></div>
+    <button id="compare">Compare</button>
+    </div>
+</div>
+
+<script src='static/tables_input.js'></script>
+
+{% endblock %}

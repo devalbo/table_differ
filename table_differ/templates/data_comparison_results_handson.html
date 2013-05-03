@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{# extends "new_base.html" #}
 
 {% block title %}Data Comparison Results{% endblock %}
 
@@ -10,11 +10,12 @@
 </STYLE> 
 {% endblock %}
 
-{% block content %}
+{% block page_content %}
+<div class="container-fluid" id="page-content">
+
 <p>
 {{ content }}
 <h1>
-<a href="{{ url_for('tables_input') }}">Back to comparison page</a>
 </h1>
 <table border="1">
 
@@ -42,5 +43,6 @@
 {% endfor %}
 </table>
 </p>
+</div>
 {% endblock %}
 

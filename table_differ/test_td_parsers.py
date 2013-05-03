@@ -11,7 +11,8 @@ class TestTd(unittest.TestCase):
 
         self.assertEqual("Test", t.get_value(0, 0))
         self.assertEqual("The Corner", t.get_value(16, 6))
-        self.assertEqual("495", t.get_value(10, 4))
+        self.assertEqual("495.0", t.get_value(10, 4))
+        self.assertEqual(495.0, t.get_value(10, 4, False))
         self.assertEqual("1/13/2013", t.get_value(0, 1))
 
 

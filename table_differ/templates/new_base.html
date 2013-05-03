@@ -1,0 +1,43 @@
+<!DOCTYPE html> 
+<html>
+
+<head> 
+  <title>{% block title %}Add Title here{% endblock %}</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  {% block head %} {% endblock %}
+  {% block style %}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='table_differ.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <link data-jsfiddle="common" rel="stylesheet" media="screen" href="{{ url_for('static', filename='jquery.handsontable.bootstrap.css') }}">
+  {% endblock %}
+</head>
+
+<body> 
+{% block content %}
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="cp-compare">Table Differ</a>
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li class="{{ header_tab_classes['quick-compare'] }}"><a href="/quick-compare">Copy/Paste Comparison</a></li>
+                    <li class="{{ header_tab_classes['table-compare'] }}"><a href="/compare">Full Comparison</a></li>
+                    <li class="{{ header_tab_classes['manage-tables'] }}"><a href="/manage-tables">Manage Tables</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block page_content %}Put page content here{% endblock %}
+
+{% endblock %}
+</body>
+</html> 

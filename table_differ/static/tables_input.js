@@ -17,6 +17,8 @@ for (var i = 0; i < dataTableIds.length; i++) {
 		minSpareCols: 1
 	});
 	handsonDataTables[i] = $(dataTableJqueryId).data('handsontable');
+//    $('#dataTable1 table').addClass('table');
+//    $('#dataTable2 table').addClass('table');
 }
 
 function post_to_url(path, params, method) {

@@ -23,13 +23,16 @@ app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 def index():
     return tables_input()
 
+@app.route('/quick-compare', methods=['GET', 'POST'])
 @app.route('/tables_input', methods=['GET', 'POST'])
 def tables_input():
     if request.method == 'GET':
-        return render_template('tables_input.html')
+        return render_template('new_tables_input.html',
+                               header_tab_classes={'quick-compare': 'active'})
 
-    t1_info, table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
-    t2_info, table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
+    print request.json['dataTable1']
+    t1_info, table1, td_table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
+    t2_info, table2, td_table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
     diffs, sames = compare_data.compare_tables(table1, table2, None)
     results = {"t1_info": t1_info,
                "t2_info": t2_info,
@@ -41,6 +44,18 @@ def tables_input():
                               "wb"))
     redirect_url = url_for('show_results', results_id=results_id)
     return flask.jsonify(redirect_url=redirect_url)
+
+@app.route('/compare', methods=['GET', 'POST'])
+def compare():
+    if request.method == 'GET':
+        return render_template('full_compare.html',
+                               header_tab_classes={'table-compare': 'active'})
+
+@app.route('/manage-tables', methods=['GET', 'POST'])
+def manage_tables():
+    if request.method == 'GET':
+        return render_template('manage-tables.html',
+                               header_tab_classes={'manage-tables': 'active'})
 
 @app.route('/results/<results_id>', methods=['GET'])
 def show_results(results_id):
@@ -78,7 +93,8 @@ def show_results(results_id):
 
     return render_template('data_comparison_results_handson.html',
                            table_rows=table_rows,
-                           options=options)
+                           options=options,
+                           header_tab_classes={})
 
 
 UPLOAD_FOLDER = 'C:\\uploaded_files'
