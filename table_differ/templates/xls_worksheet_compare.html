@@ -1,0 +1,25 @@
+{% extends "new_base.html" %}
+
+{% block title %}File Comparison{% endblock %}
+
+{% block head %}
+<script src="static/jquery.min.js"></script>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid" id="page-content">
+    <h1>Upload files</h1>
+    <div class="row-fluid"> </div>
+    <div class="row-fluid"> </div>
+    <div class="row-fluid"> </div>
+    <form action="" method=post enctype=multipart/form-data>
+        <ul>
+            <li><input type=file name=worksheet_file>Excel Workbook with Expected/Actual worksheets</input></li>
+            <li><input type=submit value=Upload></li>
+        </ul>
+    </form>
+</div>
+
+<script src='static/tables_input.js'></script>
+
+{% endblock %}

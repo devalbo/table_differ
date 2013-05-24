@@ -12,3 +12,15 @@ class TdTable:
             v = str(v)
         return v
 
+    @property
+    def row_count(self):
+        return len(self._rows)
+
+    @property
+    def col_count(self):
+        return len(max(self._rows, key=len))
+
+    @property
+    def rows(self):
+        return self._rows
+

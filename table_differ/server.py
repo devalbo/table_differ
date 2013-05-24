@@ -30,7 +30,7 @@ def tables_input():
 
     t1_info, table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     t2_info, table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
-    diffs, sames = compare_data.compare_tables(table1, table2, None)
+    diffs, sames = compare_data.compare_td_tables(table1, table2, None)
     results = {"t1_info": t1_info,
                "t2_info": t2_info,
                "diffs": diffs,

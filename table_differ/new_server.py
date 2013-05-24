@@ -3,6 +3,7 @@ import cPickle as pickle
 import uuid, os
 import td_config
 import td_parsers
+import td_persist
 import reverseproxied
 
 from flask import Flask
@@ -21,29 +22,95 @@ app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 @app.route('/')
 def index():
-    return tables_input()
+    return copy_paste_compare()
 
-@app.route('/quick-compare', methods=['GET', 'POST'])
+@app.route('/copy-paste-compare', methods=['GET', 'POST'])
 @app.route('/tables_input', methods=['GET', 'POST'])
-def tables_input():
+def copy_paste_compare():
     if request.method == 'GET':
         return render_template('new_tables_input.html',
-                               header_tab_classes={'quick-compare': 'active'})
+                               header_tab_classes={'copy-paste-compare': 'active'})
 
-    print request.json['dataTable1']
-    t1_info, table1, td_table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
-    t2_info, table2, td_table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
-    diffs, sames = compare_data.compare_tables(table1, table2, None)
-    results = {"t1_info": t1_info,
-               "t2_info": t2_info,
-               "diffs": diffs,
-               "sames": sames}
-    results_id = uuid.uuid4()
-    pickle.dump(results, open(os.path.join("compare_results",
-                                           "%s.p" % results_id),
-                              "wb"))
+    # print request.json['dataTable1']
+    # t1_info, table1, td_table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
+    # t2_info, table2, td_table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
+    # diffs, sames = compare_data.compare_tables(table1, table2, None)
+    # results = {"t1_info": t1_info,
+    #            "t2_info": t2_info,
+    #            "diffs": diffs,
+    #            "sames": sames}
+    table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
+    table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
+    diffs, sames = compare_data.compare_td_tables(table1, table2, None)
+
+    results_id = td_persist.store_results(table1, table2, diffs, sames)
+
+    # print "COL COUNT >> %s" % table1.col_count
+    # t1_info = {"row_count": table1.row_count,
+    #            "col_count": table1.col_count}
+    # t2_info = {"row_count": table2.row_count,
+    #            "col_count": table2.col_count}
+    #
+    # results = {"t1_info": t1_info,
+    #            "t2_info": t2_info,
+    #            "diffs": diffs,
+    #            "sames": sames}
+
+    # results_id = uuid.uuid4()
+    # pickle.dump(results, open(os.path.join("compare_results",
+    #                                        "%s.p" % results_id),
+    #                           "wb"))
     redirect_url = url_for('show_results', results_id=results_id)
     return flask.jsonify(redirect_url=redirect_url)
+
+@app.route('/file-compare', methods=['GET', 'POST'])
+def file_compare():
+    if request.method == 'GET':
+        return render_template('file_compare.html',
+                               header_tab_classes={'file-compare': 'active'})
+
+    actual_results_file = request.files['actual_results']
+    expected_results_file = request.files['expected_results']
+    for results_file in (actual_results_file, expected_results_file):
+        if results_file and allowed_file(results_file.filename):
+            filename = secure_filename(results_file.filename)
+            results_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return redirect(url_for('file_compare'))
+
+@app.route('/xls-worksheet-compare', methods=['GET', 'POST'])
+def xls_worksheet_compare():
+    if request.method == 'GET':
+        return render_template('xls_worksheet_compare.html',
+                               header_tab_classes={'xls-worksheet-compare': 'active'})
+
+    worksheet_results_file = request.files['worksheet_file']
+    if worksheet_results_file and allowed_file(worksheet_results_file.filename):
+        filename = secure_filename(worksheet_results_file.filename)
+        file_location = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        worksheet_results_file.save(file_location)
+
+        expected_worksheet_name = "Reference"
+        actual_worksheet_name = "Actual"
+
+        expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
+        actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
+        diffs, sames = compare_data.compare_td_tables(expected_results_table, actual_results_table, None)
+        results_id = td_persist.store_results(expected_results_table, actual_results_table, diffs, sames)
+
+    # results = {"t1_info": expected_results_table,
+        #            "t2_info": actual_results_table,
+        #            "diffs": diffs,
+        #            "sames": sames}
+        # results_id = uuid.uuid4()
+        # pickle.dump(results, open(os.path.join("compare_results",
+        #                                        "%s.p" % results_id),
+        #                           "wb"))
+        redirect_url = url_for('show_results', results_id=results_id)
+        return redirect(redirect_url)
+        # return flask.jsonify(redirect_url=redirect_url)
+
+
+    return redirect(url_for('xls_worksheet_compare'))
 
 @app.route('/compare', methods=['GET', 'POST'])
 def compare():
@@ -60,9 +127,10 @@ def manage_tables():
 @app.route('/results/<results_id>', methods=['GET'])
 def show_results(results_id):
     options = td_config.RenderTableOptions()
-    results = pickle.load(open(os.path.join("compare_results",
-                                            "%s.p" % results_id),
-                               "rb"))
+    # results = pickle.load(open(os.path.join("compare_results",
+    #                                         "%s.p" % results_id),
+    #                            "rb"))
+    results = td_persist.retrieve_results(results_id)
     t1_row_count = results["t1_info"]["row_count"]
     t2_row_count = results["t2_info"]["row_count"]
     if t1_row_count != t2_row_count:
@@ -97,7 +165,6 @@ def show_results(results_id):
                            header_tab_classes={})
 
 
-UPLOAD_FOLDER = 'C:\\uploaded_files'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'csv'])
 
 def allowed_file(filename):
@@ -122,6 +189,7 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
+UPLOAD_FOLDER = 'C:\\uploaded_files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if __name__ == "__main__":

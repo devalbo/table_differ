@@ -1,12 +1,15 @@
 
-import td_parsers
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from table_differ import td_parsers
 import unittest
 
 
-class TestTd(unittest.TestCase):
+class TestTdParsers(unittest.TestCase):
 
     def test_loading_xls_file(self):
-        t = td_parsers.load_table_from_xls("test_sheets/test_sheet.xls",
+        t = td_parsers.load_table_from_xls("test_data/test_sheet.xls",
                                            worksheet_name="MainSheet")
 
         self.assertEqual("Test", t.get_value(0, 0))
@@ -17,9 +20,9 @@ class TestTd(unittest.TestCase):
 
 
     def test_loading_handson_json_data(self):
-        with open("test_sheets/test_sheet.handson.json", "r") as f:
+        with open("test_data/test_sheet.handson.json", "r") as f:
             data = f.read().replace('\n', '')
-        table_info, td, t = td_parsers.load_table_from_handson_json(data)
+        t = td_parsers.load_table_from_handson_json(data)
 
         self.assertEqual("Test", t.get_value(1, 1))
         self.assertEqual("abc", t.get_value(0, 3))

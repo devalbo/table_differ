@@ -13,32 +13,31 @@ def load_table_from_handson_json(handson_json):
     grid_data = table_data['grid_data']
     row_count = int(table_data['row_count'])
     col_count = int(table_data['col_count'])
-    td = [[grid_data[i + (j * col_count)]
-           for i in range(col_count)]
-          for j in range(row_count)]
+    table_rows = [[grid_data[i + (j * col_count)]
+                   for i in range(col_count)]
+                  for j in range(row_count)]
 
     t = td_table.TdTable()
-    for row in td:
+    for row in table_rows:
         t.add_row(row)
 
-    table_info = {"row_count": row_count,
-                  "col_count": col_count}
+    # table_info = {"row_count": row_count,
+    #               "col_count": col_count}
 
-    return table_info, td, t
+    #return table_info, table_rows, t
+    return t
 
 def load_table_from_xls(filename, worksheet_name=""):
     wb = open_workbook(filename)
-    worksheet_found = False
-    
+
     for s in wb.sheets():
         if s.name == worksheet_name:
-            worksheet_found = True
             t = td_table.TdTable()
-            for row in range(s.nrows):
-                values = []
-                for col in range(s.ncols):
-                    values.append(s.cell(row, col).value)
-                t.add_row(values)
+            for row_index in range(s.nrows):
+                new_row = []
+                for col_index in range(s.ncols):
+                    new_row.append(s.cell(row_index, col_index).value)
+                t.add_row(new_row)
             return t
 
     raise Exception("No such worksheet found: %s" % worksheet_name)
