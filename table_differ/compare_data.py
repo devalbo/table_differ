@@ -133,9 +133,14 @@ def compare_td_tables(t1, t2, comparator):
                 
     return diffs, sames
 
+def new_compare_td_tables(t1, t2, comparator):
+    pass
+
+
 if __name__ == "__main__":
     t1 = [[str(i) for i in range(10)] for i in range(10)]
     t2 = [[str(i) for i in range(10, 0, -1)] for i in range(10, 0, -1)]
 ##    t2 = t1
     diffs = compare_td_tables(t1, t2, None)
     print diffs
+

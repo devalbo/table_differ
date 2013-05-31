@@ -31,35 +31,12 @@ def copy_paste_compare():
         return render_template('new_tables_input.html',
                                header_tab_classes={'copy-paste-compare': 'active'})
 
-    # print request.json['dataTable1']
-    # t1_info, table1, td_table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
-    # t2_info, table2, td_table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
-    # diffs, sames = compare_data.compare_tables(table1, table2, None)
-    # results = {"t1_info": t1_info,
-    #            "t2_info": t2_info,
-    #            "diffs": diffs,
-    #            "sames": sames}
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
     diffs, sames = compare_data.compare_td_tables(table1, table2, None)
 
     results_id = td_persist.store_results(table1, table2, diffs, sames)
 
-    # print "COL COUNT >> %s" % table1.col_count
-    # t1_info = {"row_count": table1.row_count,
-    #            "col_count": table1.col_count}
-    # t2_info = {"row_count": table2.row_count,
-    #            "col_count": table2.col_count}
-    #
-    # results = {"t1_info": t1_info,
-    #            "t2_info": t2_info,
-    #            "diffs": diffs,
-    #            "sames": sames}
-
-    # results_id = uuid.uuid4()
-    # pickle.dump(results, open(os.path.join("compare_results",
-    #                                        "%s.p" % results_id),
-    #                           "wb"))
     redirect_url = url_for('show_results', results_id=results_id)
     return flask.jsonify(redirect_url=redirect_url)
 
@@ -94,21 +71,12 @@ def xls_worksheet_compare():
 
         expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
         actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
-        diffs, sames = compare_data.compare_td_tables(expected_results_table, actual_results_table, None)
+        # diffs, sames = compare_data.compare_td_tables(expected_results_table, actual_results_table, None)
+        diffs, sames, t1_only, t2_only = compare_data.new_compare_td_tables(expected_results_table, actual_results_table, None)
         results_id = td_persist.store_results(expected_results_table, actual_results_table, diffs, sames)
 
-    # results = {"t1_info": expected_results_table,
-        #            "t2_info": actual_results_table,
-        #            "diffs": diffs,
-        #            "sames": sames}
-        # results_id = uuid.uuid4()
-        # pickle.dump(results, open(os.path.join("compare_results",
-        #                                        "%s.p" % results_id),
-        #                           "wb"))
-        redirect_url = url_for('show_results', results_id=results_id)
+        redirect_url = url_for('show_new_results', results_id=results_id)
         return redirect(redirect_url)
-        # return flask.jsonify(redirect_url=redirect_url)
-
 
     return redirect(url_for('xls_worksheet_compare'))
 
@@ -127,9 +95,7 @@ def manage_tables():
 @app.route('/results/<results_id>', methods=['GET'])
 def show_results(results_id):
     options = td_config.RenderTableOptions()
-    # results = pickle.load(open(os.path.join("compare_results",
-    #                                         "%s.p" % results_id),
-    #                            "rb"))
+
     results = td_persist.retrieve_results(results_id)
     t1_row_count = results["t1_info"]["row_count"]
     t2_row_count = results["t2_info"]["row_count"]
@@ -164,6 +130,46 @@ def show_results(results_id):
                            options=options,
                            header_tab_classes={})
 
+@app.route('/new_results/<results_id>', methods=['GET'])
+def show_new_results(results_id):
+    options = td_config.RenderTableOptions()
+
+    report_notes = []
+
+    results = td_persist.retrieve_results(results_id)
+    t1_row_count = results["t1_info"]["row_count"]
+    t2_row_count = results["t2_info"]["row_count"]
+    if t1_row_count != t2_row_count:
+        report_note = "Error - different numbers of rows (%s / %s)" % (t1_row_count,
+                                                                       t2_row_count)
+        report_notes.append(report_note)
+
+    t1_col_count = results["t1_info"]["col_count"]
+    t2_col_count = results["t2_info"]["col_count"]
+    if t1_col_count != t2_col_count:
+        report_note = "Error - different numbers of columns (%s / %s)" % (t1_col_count,
+                                                                          t2_col_count)
+        report_notes.append(report_note)
+
+    table_rows = []
+    for row_index in range(t1_row_count):
+        table_row = []
+        for col_index in range(t1_col_count):
+            if (row_index, col_index) in results["sames"]:
+                item = ("%s" % results["sames"][(row_index, col_index)], "ok")
+            else:
+                item = (Markup("Expected: %s<br>Actual: %s" %
+                               results["diffs"][(row_index, col_index)]),
+                        "mismatch")
+
+            table_row.append(item)
+
+        table_rows.append(table_row)
+
+    return render_template('data_comparison_results_handson.html',
+                           table_rows=table_rows,
+                           options=options,
+                           header_tab_classes={})
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'csv'])
 
