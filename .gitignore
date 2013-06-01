@@ -38,3 +38,5 @@ nosetests.xml
 table_differ/venv/
 table_differ/compare_results/
 .idea
+
+venv

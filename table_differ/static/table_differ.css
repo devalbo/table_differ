@@ -8,3 +8,6 @@
 
 .mismatch { background-color:red; color:white; }
 .ok { background-color:#33FF99; color:black; }
+.missing_expected { background-color: red; color: white; }
+.missing_actual { background-color: red; color: white; }
+.padding { background-color: white; color: white; }

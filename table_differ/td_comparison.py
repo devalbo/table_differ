@@ -32,6 +32,14 @@ class TdComparison:
         return max(self._expected_table.col_count, self._actual_table.col_count)
 
     @property
+    def expected_table(self):
+        return self._expected_table
+
+    @property
+    def actual_table(self):
+        return self._actual_table
+
+    @property
     def diff_cells(self):
         return self._diff_cells
 
@@ -90,7 +98,6 @@ class TdComparison:
                         actual_table_only_cells[(row_index, col_index)] = self._actual_table.get_value(row_index, col_index)
                     except (KeyError, IndexError):
                         pass
-                        # neither_table_cell_coords.append((row_index, col_index))
 
                 try:
                     actual_table_cell_value = self._actual_table.get_value(row_index, col_index)
@@ -100,7 +107,6 @@ class TdComparison:
                         expected_table_only_cells[(row_index, col_index)] = self._expected_table.get_value(row_index, col_index)
                     except (KeyError, IndexError):
                         pass
-                        # neither_table_cell_coords.append((row_index, col_index))
 
                 if expected_table_cell_found and actual_table_cell_found:
                     if expected_table_cell_value != actual_table_cell_value:

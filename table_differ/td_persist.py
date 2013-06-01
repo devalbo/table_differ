@@ -4,6 +4,8 @@ import os
 import uuid
 import pickle
 
+UPLOAD_FOLDER = '/tmp'
+
 def store_results(table1, table2, diffs, sames):
     t1_info = {"row_count": table1.row_count,
                "col_count": table1.col_count}
@@ -23,7 +25,24 @@ def store_results(table1, table2, diffs, sames):
 
 
 def retrieve_results(results_id):
-    results = pickle.load(open(os.path.join("compare_results",
+    results = pickle.load(open(os.path.join(UPLOAD_FOLDER, "compare_results",
                                             "%s.p" % results_id),
                                "rb"))
     return results
+
+def store_new_comparison(comparison):
+    comparison_id = uuid.uuid4()
+    pickle.dump(comparison, open(os.path.join(UPLOAD_FOLDER,
+                                              "compare_results",
+                                              "%s.p" % comparison_id,
+                                              ),
+                                 "wb"))
+    return comparison_id
+
+def retrieve_new_comparison(comparison_id):
+    comparison = pickle.load(open(os.path.join(UPLOAD_FOLDER,
+                                               "compare_results",
+                                               "%s.p" % comparison_id,
+                                               ),
+                                  "rb"))
+    return comparison
