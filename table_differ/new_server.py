@@ -5,13 +5,13 @@ import td_parsers
 import td_persist
 import reverseproxied
 
+import flask
 from flask import Flask
 from flask import render_template
 from flask import request
 from flask import url_for
 from flask import redirect
 from flask import Markup
-import flask
 from werkzeug import secure_filename
 
 
@@ -20,9 +20,6 @@ app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 
 @app.route('/')
-def index():
-    return copy_paste_compare()
-
 @app.route('/copy-paste-compare', methods=['GET', 'POST'])
 def copy_paste_compare():
     if request.method == 'GET':
