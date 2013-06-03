@@ -108,6 +108,11 @@ def show_new_results(comparison_id):
                                                                                             actual_col_count)
         report_notes.append(report_note)
 
+    if not comparison.tables_equivalent:
+        report_note = "Error - %s different cells; %s cells are the same" % (len(comparison.diff_cells),
+                                                                             len(comparison.same_cells))
+        report_notes.append(report_note)
+
     table_rows = []
     for row_index in range(comparison.max_rows):
         table_row = []
@@ -165,7 +170,8 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
-UPLOAD_FOLDER = '/tmp'
+#UPLOAD_FOLDER = '/tmp'
+UPLOAD_FOLDER = 'C:\\uploaded_files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if __name__ == "__main__":
