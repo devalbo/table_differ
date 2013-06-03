@@ -24,14 +24,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="cp-compare">Table Differ</a>
+            <a class="brand" href="{{ url_for('copy_paste_compare') }}">Table Differ</a>
             <div class="nav-collapse">
                 <ul class="nav">
                     <li class="{{ header_tab_classes['copy-paste-compare'] }}"><a href="{{ url_for('copy_paste_compare') }}">Copy/Paste Comparison</a></li>
-                    <li class="{{ header_tab_classes['file-compare'] }}"><a href="{{ url_for('file_compare') }}">File Comparison</a></li>
-                    <li class="{{ header_tab_classes['xls-worksheet-compare'] }}"><a href="{{ url_for('xls_worksheet_compare') }}">QC Act/Ref Comparison</a></li>
-                    <li class="{{ header_tab_classes['table-compare'] }}"><a href="/compare">Full Comparison</a></li>
-                    <li class="{{ header_tab_classes['manage-tables'] }}"><a href="/manage-tables">Manage Tables</a></li>
+{#                    <li class="{{ header_tab_classes['file-compare'] }}"><a href="{{ url_for('file_compare') }}">File Comparison</a></li>#}
+                    <li class="{{ header_tab_classes['xls-worksheet-compare'] }}"><a href="{{ url_for('xls_worksheet_compare') }}">QC Ref/Act Comparison</a></li>
+{#                    <li class="{{ header_tab_classes['table-compare'] }}"><a href="/compare">Full Comparison</a></li>#}
+{#                    <li class="{{ header_tab_classes['manage-tables'] }}"><a href="/manage-tables">Manage Tables</a></li>#}
                 </ul>
             </div>
         </div>

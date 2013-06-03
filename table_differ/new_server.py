@@ -1,6 +1,5 @@
 import compare_data
-import cPickle as pickle
-import uuid, os
+import os
 import td_config
 import td_parsers
 import td_persist
@@ -25,7 +24,6 @@ def index():
     return copy_paste_compare()
 
 @app.route('/copy-paste-compare', methods=['GET', 'POST'])
-@app.route('/tables_input', methods=['GET', 'POST'])
 def copy_paste_compare():
     if request.method == 'GET':
         return render_template('new_tables_input.html',
@@ -33,11 +31,11 @@ def copy_paste_compare():
 
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
-    diffs, sames = compare_data.compare_td_tables(table1, table2, None)
 
-    results_id = td_persist.store_results(table1, table2, diffs, sames)
+    comparison = compare_data.compare_tables(table1, table2, None)
+    comparison_id = td_persist.store_new_comparison(comparison)
 
-    redirect_url = url_for('show_results', results_id=results_id)
+    redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return flask.jsonify(redirect_url=redirect_url)
 
 @app.route('/file-compare', methods=['GET', 'POST'])
@@ -72,12 +70,8 @@ def xls_worksheet_compare():
         expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
         actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
 
-        # diffs, sames = compare_data.compare_td_tables(expected_results_table, actual_results_table, None)
-        # results_id = td_persist.store_results(expected_results_table, actual_results_table, diffs, sames)
-
-        comparison = compare_data.new_compare_td_tables(expected_results_table, actual_results_table, None)
+        comparison = compare_data.compare_tables(expected_results_table, actual_results_table, None)
         comparison_id = td_persist.store_new_comparison(comparison)
-
 
         redirect_url = url_for('show_new_results', comparison_id=comparison_id)
         return redirect(redirect_url)
@@ -96,44 +90,6 @@ def manage_tables():
         return render_template('manage-tables.html',
                                header_tab_classes={'manage-tables': 'active'})
 
-@app.route('/results/<results_id>', methods=['GET'])
-def show_results(results_id):
-    options = td_config.RenderTableOptions()
-
-    results = td_persist.retrieve_results(results_id)
-    t1_row_count = results["t1_info"]["row_count"]
-    t2_row_count = results["t2_info"]["row_count"]
-    if t1_row_count != t2_row_count:
-        return "Error - different numbers of rows (%s / %s)" % (t1_row_count,
-                                                                t2_row_count)
-
-    t1_col_count = results["t1_info"]["col_count"]
-    t2_col_count = results["t2_info"]["col_count"]
-    if t1_col_count != t2_col_count:
-        return "Error - different numbers of columns (%s / %s)" % (t1_col_count,
-
-                                                                   t2_col_count)
-
-    table_rows = []
-    for row_index in range(t1_row_count):
-        table_row = []
-        for col_index in range(t1_col_count):
-            if (row_index, col_index) in results["sames"]:
-                item = ("%s" % results["sames"][(row_index, col_index)], "ok")
-            else:
-                item = (Markup("Expected: %s<br>Actual: %s" %
-                               results["diffs"][(row_index, col_index)]),
-                        "mismatch")
-
-            table_row.append(item)
-
-        table_rows.append(table_row)
-
-    return render_template('data_comparison_results_handson.html',
-                           table_rows=table_rows,
-                           options=options,
-                           header_tab_classes={})
-
 @app.route('/new_results/<comparison_id>', methods=['GET'])
 def show_new_results(comparison_id):
     options = td_config.RenderTableOptions()
@@ -143,17 +99,16 @@ def show_new_results(comparison_id):
     comparison = td_persist.retrieve_new_comparison(comparison_id)
     expected_row_count = comparison.expected_table.row_count
     actual_row_count = comparison.actual_table.row_count
-    # actual_row_count = results["t2_info"]["row_count"]
     if expected_row_count != actual_row_count:
-        report_note = "Error - different numbers of rows (%s / %s)" % (expected_row_count,
-                                                                       actual_row_count)
+        report_note = "Error - different numbers of rows (Expected: %s / Actual: %s)" % (expected_row_count,
+                                                                                         actual_row_count)
         report_notes.append(report_note)
 
     expected_col_count = comparison.expected_table.col_count
     actual_col_count = comparison.actual_table.col_count
     if expected_col_count != actual_col_count:
-        report_note = "Error - different numbers of columns (%s / %s)" % (expected_col_count,
-                                                                          actual_col_count)
+        report_note = "Error - different numbers of columns (Expected: %s / Actual: %s)" % (expected_col_count,
+                                                                                            actual_col_count)
         report_notes.append(report_note)
 
     table_rows = []
@@ -179,13 +134,13 @@ def show_new_results(comparison_id):
             else:
                 raise Exception("Untreated cell: %s" % ((row_index, col_index)))
 
-
             table_row.append(item)
 
         table_rows.append(table_row)
 
     return render_template('data_comparison_new_results.html',
                            table_rows=table_rows,
+                           report_notes=report_notes,
                            options=options,
                            header_tab_classes={})
 

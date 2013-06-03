@@ -11,6 +11,7 @@ class TdComparison:
         self._expected_table_only_cells = None
         self._actual_table_only_cells = None
         self._neither_table_cell_coords = None
+        self._comparison_notes = []
         self._comparator = None
 
     def do_comparison(self, comparator):
@@ -58,6 +59,10 @@ class TdComparison:
     @property
     def neither_table_cell_coords(self):
         return self._neither_table_cell_coords
+
+    @property
+    def comparison_notes(self):
+        return self._comparison_notes
 
     @property
     def tables_equivalent(self):

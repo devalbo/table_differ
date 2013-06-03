@@ -5,13 +5,16 @@
 {% block page_content %}
 <div class="container-fluid" id="page-content">
 
-<h1>
-    <ul>
-    {% for report_note in report_notes %}
-        <li>{{ report_note }}</li>
-    {% endfor %}
-    </ul>
-</h1>
+{% if options.show_row_col_labels %}
+  <h1>Report Notes</h1>
+
+  <ul>
+  {% for report_note in report_notes %}
+      <li>{{ report_note }}</li>
+  {% endfor %}
+  </ul>
+{% endif %}
+
 <table border="1">
 
 {% if options.show_row_col_labels %}

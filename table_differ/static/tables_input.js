@@ -56,7 +56,11 @@ $('#compare').click(function() {
 		
 		for (i = 0; i < row_count; i++) {
 			for (j = 0; j < col_count; j++) {
-				grid_data[grid_data_index] = table_data[i][j];
+                if (table_data[i][j] === null) {
+                    grid_data[grid_data_index] = "";
+                } else {
+    				grid_data[grid_data_index] = table_data[i][j];
+                }
 				grid_data_index++;
 			}
 		}
