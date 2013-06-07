@@ -4,7 +4,8 @@ import os
 import uuid
 import pickle
 
-UPLOAD_FOLDER = '/tmp'
+#UPLOAD_FOLDER = '/tmp'
+UPLOAD_FOLDER = ''
 
 def store_results(table1, table2, diffs, sames):
     t1_info = {"row_count": table1.row_count,

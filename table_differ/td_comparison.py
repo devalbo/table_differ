@@ -1,3 +1,5 @@
+import re
+
 COMPARE_LITERAL = "COMPARE_LITERAL"
 COMPARE_RE_SKIP = "COMPARE_RE_SKIP"
 
@@ -83,6 +85,19 @@ class TdComparison:
         return True
 
     def _do_compare_literal(self):
+        def literal_compare_func(expected_value, actual_value):
+            return expected_value == actual_value
+
+        return self._do_compare(literal_compare_func)
+
+    def _do_compare_re_skip(self):
+        def re_compare_func(expected_value, actual_value):
+            rx = re.compile(expected_value)
+            return rx.match(actual_value) is not None
+
+        return self._do_compare(re_compare_func)
+
+    def _do_compare(self, compare_func):
         diffs = {}
         sames = {}
         expected_table_only_cells = {}
@@ -114,10 +129,10 @@ class TdComparison:
                         pass
 
                 if expected_table_cell_found and actual_table_cell_found:
-                    if expected_table_cell_value != actual_table_cell_value:
-                        diffs[(row_index, col_index)] = (expected_table_cell_value, actual_table_cell_value)
-                    else:
+                    if compare_func(expected_table_cell_value, actual_table_cell_value):
                         sames[(row_index, col_index)] = expected_table_cell_value
+                    else:
+                        diffs[(row_index, col_index)] = (expected_table_cell_value, actual_table_cell_value)
 
                 elif not expected_table_cell_found and not actual_table_cell_found:
                     neither_table_cell_coords.append((row_index, col_index))
@@ -128,5 +143,3 @@ class TdComparison:
         self._actual_table_only_cells = actual_table_only_cells
         self._neither_table_cell_coords = neither_table_cell_coords
 
-    def _do_compare_re_skip(self):
-        raise Exception("Not implemented")

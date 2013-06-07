@@ -3,6 +3,7 @@ import os
 import td_config
 import td_parsers
 import td_persist
+import td_comparison
 import reverseproxied
 
 import flask
@@ -67,7 +68,7 @@ def xls_worksheet_compare():
         expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
         actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
 
-        comparison = compare_data.compare_tables(expected_results_table, actual_results_table, None)
+        comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
         comparison_id = td_persist.store_new_comparison(comparison)
 
         redirect_url = url_for('show_new_results', comparison_id=comparison_id)
