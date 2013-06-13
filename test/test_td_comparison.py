@@ -138,6 +138,55 @@ class TestTdComparison(unittest.TestCase):
         self.assertEqual(3, len(comparison.actual_table_only_cells))
         self.assertEqual(1, len(comparison.neither_table_cell_coords))
 
+    def test_comparing_different_re_tables(self):
+        expected_table = td_table.TdTable()
+        actual_table = td_table.TdTable()
+
+        for r in [["", "a2", "a3"],
+                  ["b1", "", "b3"],
+                  ["c1", "c2", "c3"]]:
+            expected_table.add_row(r)
+
+        for r in [["a1", "a2", "a3"],
+                  ["b1", "b2", "b3"],
+                  ["c1", "c2", "c3"]]:
+            actual_table.add_row(r)
+
+        comparison = td_comparison.TdComparison(expected_table, actual_table)
+        comparison.do_comparison(td_comparison.COMPARE_RE_SKIP)
+
+        self.assertFalse(comparison.tables_equivalent)
+        print comparison.diff_cells
+        self.assertEqual(2, len(comparison.diff_cells))
+        self.assertEqual(7, len(comparison.same_cells))
+        self.assertEqual(0, len(comparison.expected_table_only_cells))
+        self.assertEqual(0, len(comparison.actual_table_only_cells))
+
+
+    def test_comparing_different_re_tables(self):
+        expected_table = td_table.TdTable()
+        actual_table = td_table.TdTable()
+
+        for r in [["", "a2", "a3"],
+                  ["b1", "", "b3"],
+                  ["c1", "c2", "c3"]]:
+            expected_table.add_row(r)
+
+        for r in [["a1", "a2", "a3"],
+                  ["b1", "b2", "b3"],
+                  ["c1", "c2", "c3"]]:
+            actual_table.add_row(r)
+
+        comparison = td_comparison.TdComparison(expected_table, actual_table)
+        comparison.do_comparison(td_comparison.COMPARE_RE_SKIP)
+
+        self.assertFalse(comparison.tables_equivalent)
+        print comparison.diff_cells
+        self.assertEqual(2, len(comparison.diff_cells))
+        self.assertEqual(7, len(comparison.same_cells))
+        self.assertEqual(0, len(comparison.expected_table_only_cells))
+        self.assertEqual(0, len(comparison.actual_table_only_cells))
+
 
 if __name__ == "__main__":
     unittest.main()

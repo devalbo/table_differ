@@ -92,7 +92,7 @@ class TdComparison:
 
     def _do_compare_re_skip(self):
         def re_compare_func(expected_value, actual_value):
-            rx = re.compile(expected_value)
+            rx = re.compile("^%s$" % expected_value)
             return rx.match(actual_value) is not None
 
         return self._do_compare(re_compare_func)
