@@ -73,7 +73,7 @@ $('#compare').click(function() {
 	}
 	
 	$.ajax({
-	  url: "tables_input",
+	  url: "copy-paste-compare",
 	  data: JSON.stringify(tableData), //returns all cells' data
 	  dataType: 'json',
 	  contentType: 'application/json',

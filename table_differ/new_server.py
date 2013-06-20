@@ -30,7 +30,7 @@ def copy_paste_compare():
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
 
-    comparison = compare_data.compare_tables(table1, table2, None)
+    comparison = compare_data.compare_tables(table1, table2, td_comparison.COMPARE_LITERAL)
     comparison_id = td_persist.store_new_comparison(comparison)
 
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
