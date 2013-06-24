@@ -21,7 +21,7 @@ Windows
 http://www.slideshare.net/sivasubramaniam3/installing-python-setup-tools-virtual-env-in-windows
 
 * Create a virtual environment to develop with
-> virtual venv-table_differ
+> virtualenv venv-table_differ
 
 * Activate the virtual environment
 
