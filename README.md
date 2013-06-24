@@ -17,8 +17,8 @@ Windows
 
 * Git clone the fork
 
-* Get VirtualEnv running... this will help keep development environment clean and reproducible
-http://www.slideshare.net/sivasubramaniam3/installing-python-setup-tools-virtual-env-in-windows
+* Get Pip and VirtualEnv running... this will help keep development environment clean and reproducible
+https://zignar.net/2012/06/17/install-python-on-windows/
 
 * Create a virtual environment to develop with
 > virtualenv venv-table_differ
