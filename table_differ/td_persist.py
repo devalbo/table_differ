@@ -3,9 +3,7 @@ __author__ = 'ajboehmler'
 import os
 import uuid
 import pickle
-
-#UPLOAD_FOLDER = '/tmp'
-UPLOAD_FOLDER = ''
+from app import app
 
 def store_results(table1, table2, diffs, sames):
     t1_info = {"row_count": table1.row_count,
@@ -19,21 +17,23 @@ def store_results(table1, table2, diffs, sames):
                "sames": sames}
 
     results_id = uuid.uuid4()
-    pickle.dump(results, open(os.path.join("compare_results",
+    pickle.dump(results, open(os.path.join(app.config['STORAGE_LOCATION'],
+                                           "compare_results",
                                            "%s.p" % results_id),
                               "wb"))
     return results_id
 
 
 def retrieve_results(results_id):
-    results = pickle.load(open(os.path.join(UPLOAD_FOLDER, "compare_results",
+    results = pickle.load(open(os.path.join(app.config['STORAGE_LOCATION'],
+                                            "compare_results",
                                             "%s.p" % results_id),
                                "rb"))
     return results
 
 def store_new_comparison(comparison):
     comparison_id = uuid.uuid4()
-    pickle.dump(comparison, open(os.path.join(UPLOAD_FOLDER,
+    pickle.dump(comparison, open(os.path.join(app.config['STORAGE_LOCATION'],
                                               "compare_results",
                                               "%s.p" % comparison_id,
                                               ),
@@ -41,7 +41,7 @@ def store_new_comparison(comparison):
     return comparison_id
 
 def retrieve_new_comparison(comparison_id):
-    comparison = pickle.load(open(os.path.join(UPLOAD_FOLDER,
+    comparison = pickle.load(open(os.path.join(app.config['STORAGE_LOCATION'],
                                                "compare_results",
                                                "%s.p" % comparison_id,
                                                ),

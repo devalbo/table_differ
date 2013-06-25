@@ -171,10 +171,6 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
-#UPLOAD_FOLDER = '/tmp'
-UPLOAD_FOLDER = 'C:\\uploaded_files'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0',
             debug=True)
