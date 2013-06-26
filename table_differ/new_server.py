@@ -4,7 +4,6 @@ import td_config
 import td_parsers
 import td_persist
 import td_comparison
-import reverseproxied
 
 import flask
 from flask import Flask
@@ -15,9 +14,9 @@ from flask import redirect
 from flask import Markup
 from werkzeug import secure_filename
 
-
-app = Flask(__name__)
-app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
+from app import app
+# app = Flask(__name__)
+# app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 

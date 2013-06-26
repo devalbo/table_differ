@@ -1,6 +1,6 @@
 __author__ = 'ajboehmler'
 
-import platform
+import platform, os
 
 class Configuration(object):
     DATABASE = {
@@ -16,3 +16,5 @@ class Configuration(object):
         STORAGE_LOCATION = 'C:\\table_differ'
     else:
         STORAGE_LOCATION = '/tmp/table_differ'
+
+    UPLOAD_FOLDER = os.path.join(STORAGE_LOCATION, 'uploads')
