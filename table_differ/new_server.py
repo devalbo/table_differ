@@ -8,17 +8,16 @@ import td_comparison
 import datetime
 
 import flask
-from flask import Flask
 from flask import render_template
 from flask import request
 from flask import url_for
 from flask import redirect
 from flask import Markup
+from flask import send_from_directory
+
 from werkzeug import secure_filename
 
 from app import app
-# app = Flask(__name__)
-# app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
@@ -121,6 +120,12 @@ def show_new_results(comparison_id):
                                                                              len(comparison.same_cells))
         report_notes.append(report_note)
 
+    for cell in comparison.diff_cells:
+        report_notes.append("[%s,%s] Expected: %s Actual: %s" %
+                            (cell[0], cell[1],
+                             comparison.expected_table.get_value(cell[0], cell[1]),
+                             comparison.actual_table.get_value(cell[0], cell[1])))
+
     table_rows = []
     for row_index in range(comparison.max_rows):
         table_row = []
@@ -164,8 +169,6 @@ def uploads():
             return redirect(url_for('uploaded_file',
                                     filename=filename))
     return render_template("uploads.html")
-
-from flask import send_from_directory
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -244,4 +247,5 @@ def save_excel_file(file, directory):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',
+            port=5005,
             debug=True)
