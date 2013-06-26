@@ -10,3 +10,12 @@ admin = models.User(username='admin',
                     active=True)
 admin.set_password('admin')
 admin.save()
+
+models.UploadedFile.create_table()
+models.Baseline.create_table()
+
+# Create the comparison settings table.
+models.ComparisonType.create_table()
+
+models.ComparisonType.create(name='Literal')
+models.ComparisonType.create(name='Regular Expression')

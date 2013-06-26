@@ -18,3 +18,15 @@ class User(db.Model, BaseUser):
     def __unicode__(self):
         return self.username
 
+class UploadedFile(db.Model):
+    name = CharField()
+    directory = CharField()
+    created = DateTimeField()
+
+class ComparisonType(db.Model):
+    name = CharField()
+
+class Baseline(db.Model):
+    name = CharField()
+    file = ForeignKeyField(UploadedFile)
+    comparison = ForeignKeyField(ComparisonType)
