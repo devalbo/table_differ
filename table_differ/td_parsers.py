@@ -28,11 +28,11 @@ def load_table_from_handson_json(handson_json):
     #return table_info, table_rows, t
     return t
 
-def load_table_from_xls(filename, worksheet_name = None):
+def load_table_from_xls(filename, worksheet_name=""):
     wb = open_workbook(filename)
 
     for s in wb.sheets():
-        if worksheet_name == None or s.name == worksheet_name:
+        if s.name == worksheet_name or worksheet_name == "":
             t = td_table.TdTable()
             for row_index in range(s.nrows):
                 new_row = []
