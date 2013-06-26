@@ -29,4 +29,4 @@ class ComparisonType(db.Model):
 class Baseline(db.Model):
     name = CharField()
     file = ForeignKeyField(UploadedFile)
-    settings = ForeignKeyField(ComparisonSettings)
+    settings = ForeignKeyField(ComparisonType)
