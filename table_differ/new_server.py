@@ -4,9 +4,6 @@ import td_config
 import td_parsers
 import td_persist
 import td_comparison
-import reverseproxied
-import models
-import datetime
 
 import flask
 from flask import Flask
@@ -17,12 +14,53 @@ from flask import redirect
 from flask import Markup
 from werkzeug import secure_filename
 
-from admin import admin
+from app import app
+# app = Flask(__name__)
+# app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
+ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
-app = Flask(__name__)
-app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+def save_file(file, prefix=""):
+    if file and allowed_file(file.filename):
+        filename = secure_filename(prefix + file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return filename
+    return None
+
+def compare_files(first_filename, second_filename):
+    expected_results_path = os.path.join(app.config['UPLOAD_FOLDER'], first_filename)
+    expected_results_table = td_parsers.load_table_from_xls(expected_results_path)
+
+    actual_results_path = os.path.join(app.config['UPLOAD_FOLDER'], second_filename)
+    actual_results_table = td_parsers.load_table_from_xls(actual_results_path)
+
+    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_LITERAL)
+    comparison_id = td_persist.store_new_comparison(comparison)
+
+    redirect_url = url_for('show_new_results', comparison_id=comparison_id)
+    return redirect_url
+
+# Phil's test.
+@app.route('/compare-two-files', methods=['GET', 'POST'])
+def compare_two_files():
+    # If the page request is GET, simply display the upload page.
+    if (request.method == 'GET'):
+        return render_template('compare_two_files.html', header_tab_classes={'phil-test': 'active'})
+
+    # Otherwise, store the files on the server.
+    if (request.method == 'POST'):
+        savedExpected = save_file(request.files['expected_results'], "e_")
+        savedActual = save_file(request.files['actual_results'], "a_")
+        comparison_results = compare_files(savedExpected, savedActual)
+        if savedExpected and savedActual:
+            return redirect(comparison_results)
+
+    # If anything goes wrong, just return to the upload page for now.
+    return render_template('compare_two_files.html', header_tab_classes={'phil-test': 'active'})
 
 @app.route('/')
 @app.route('/copy-paste-compare', methods=['GET', 'POST'])
@@ -40,6 +78,7 @@ def copy_paste_compare():
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return flask.jsonify(redirect_url=redirect_url)
 
+# Does this work?
 @app.route('/file-compare', methods=['GET', 'POST'])
 def file_compare():
     if request.method == 'GET':
@@ -151,12 +190,6 @@ def show_new_results(comparison_id):
                            options=options,
                            header_tab_classes={})
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'xlsx', 'csv'])
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
 @app.route('/uploads', methods=['GET', 'POST'])
 def uploads():
     if request.method == 'POST':
@@ -175,78 +208,6 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
-# Upload an Excel baseline and store it in the database.
-@app.route('/upload/baseline', methods=['GET', 'POST'])
-def upload_baseline():
-    # If there are files in the request, store them.
-    if request.method == 'POST':
-        baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
-        baseline_record = models.Baseline.create(
-            name=request.form['baseline_name'],
-            file=baseline_file.id,
-            settings=1
-        )
-        return "Success :D"
-
-    # If there are no files present, display the upload page.
-    return render_template('upload_baseline.html',
-                               header_tab_classes={'upload-baseline': 'active'})
-
-# Compare a file with an existing baseline.
-@app.route('/compare/baseline', methods=['GET', 'POST'])
-def compare_baseline():
-    if request.method == 'GET':
-        baselines = models.Baseline.select()
-        return render_template('compare_baseline.html',
-            header_tab_classes={'compare-baseline': 'active'}, baselines=baselines)
-
-    baseline_id = request.form['baseline_id']
-    baseline = models.Baseline.get(models.Baseline.id == baseline_id)
-    baseline_path = get_excel_file_path(baseline.file)
-
-    actual_file = save_excel_file(request.files['compare_file'], 'actual')
-
-    expected_results_table = td_parsers.load_table_from_xls(baseline_path)
-    actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
-
-    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_LITERAL)
-    comparison_id = td_persist.store_new_comparison(comparison)
-
-    redirect_url = url_for('show_new_results', comparison_id=comparison_id)
-    return redirect(redirect_url)
-
-def get_excel_file_path(file_id):
-    file_record = models.UploadedFile.get(models.UploadedFile.id == file_id)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_record.directory, file_record.name)
-    return file_path
-
-def save_excel_file(file, directory):
-    if file and allowed_file(file.filename):
-        # Create a new file record object in the database.
-        file_record = models.UploadedFile()
-        file_record.name = ''
-        file_record.directory = directory
-        file_record.created = datetime.datetime.now()
-        file_record.save()
-
-        # Store the file with the file record's ID prepended to the name.
-        filename = secure_filename(str(file_record.id) + '_' + file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], directory, filename))
-
-        # Update the file record with the file's name.
-        file_record.name = filename
-        file_record.save()
-
-        return file_record
-
-    raise Exception('The file is not valid!')
-
-
-#UPLOAD_FOLDER = '/tmp'
-UPLOAD_FOLDER = 'C:\\uploaded_files'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 if __name__ == "__main__":
-    admin.setup()
     app.run(host='0.0.0.0',
             debug=True)

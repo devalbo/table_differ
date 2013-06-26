@@ -29,6 +29,12 @@ class TestTdParsers(unittest.TestCase):
         self.assertEqual("1/13/2012", t.get_value(5, 7))
         self.assertEqual("495", t.get_value(2, 6))
 
+    def test_loading_csv_file(self):
+        t = td_parsers.load_table_from_csv("test_data/test_sheet.csv")
+        self.assertEqual("Test", t.get_value(0, 0))
+        self.assertEqual("The Corner", t.get_value(16, 6))
+        self.assertEqual("495", t.get_value(10, 4))
+        self.assertEqual("1/13/2013", t.get_value(0, 1))
 
 if __name__ == "__main__":
     unittest.main()
