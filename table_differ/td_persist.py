@@ -19,7 +19,7 @@ def store_results(table1, table2, diffs, sames):
                "sames": sames}
 
     results_id = uuid.uuid4()
-    pickle.dump(results, open(os.path.join("compare_results",
+    pickle.dump(results, open(os.path.join(UPLOAD_FOLDER, "compare_results",
                                            "%s.p" % results_id),
                               "wb"))
     return results_id
