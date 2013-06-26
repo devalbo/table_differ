@@ -3,6 +3,7 @@
 import json
 from xlrd import open_workbook
 import td_table
+import csv
 
 
 def load_table_from_handson_json(handson_json):
@@ -41,6 +42,18 @@ def load_table_from_xls(filename, worksheet_name = None):
             return t
 
     raise Exception("No such worksheet found: %s" % worksheet_name)
+
+
+def load_table_from_csv(filename):
+    t = td_table.TdTable()
+    with open(filename, 'rb') as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in csvReader:
+            new_row = []
+            for value in row:
+                new_row.append(value)
+            t.add_row(new_row)
+        return t
 
 
 # adapted from https://code.google.com/p/pydataframe/source/browse/pydataframe/parsers.py
