@@ -11,7 +11,7 @@ Windows
 
 * Install Python 2.7 from http://www.python.org
 
-* Get git working (git hub has Git for Windows at http://msysgit.github.io/)
+* Get git working (git hub has Github for Windows at http://windows.github.com/)
 
 * Make a fork of the table_differ repository in github
 
