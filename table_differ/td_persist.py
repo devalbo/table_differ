@@ -5,7 +5,7 @@ import uuid
 import pickle
 
 #UPLOAD_FOLDER = '/tmp'
-UPLOAD_FOLDER = ''
+UPLOAD_FOLDER = 'C:\\uploaded_files'
 
 def store_results(table1, table2, diffs, sames):
     t1_info = {"row_count": table1.row_count,
@@ -19,7 +19,7 @@ def store_results(table1, table2, diffs, sames):
                "sames": sames}
 
     results_id = uuid.uuid4()
-    pickle.dump(results, open(os.path.join("compare_results",
+    pickle.dump(results, open(os.path.join(UPLOAD_FOLDER, "compare_results",
                                            "%s.p" % results_id),
                               "wb"))
     return results_id

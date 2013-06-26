@@ -19,6 +19,49 @@ from werkzeug import secure_filename
 app = Flask(__name__)
 app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
+ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+def save_file(file, prefix=""):
+    if file and allowed_file(file.filename):
+        filename = secure_filename(prefix + file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return filename
+    return None
+
+def compare_files(first_filename, second_filename):
+    expected_results_path = os.path.join(app.config['UPLOAD_FOLDER'], first_filename)
+    expected_results_table = td_parsers.load_table_from_xls(expected_results_path)
+
+    actual_results_path = os.path.join(app.config['UPLOAD_FOLDER'], second_filename)
+    actual_results_table = td_parsers.load_table_from_xls(actual_results_path)
+
+    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_LITERAL)
+    comparison_id = td_persist.store_new_comparison(comparison)
+
+    redirect_url = url_for('show_new_results', comparison_id=comparison_id)
+    return redirect_url
+
+# Phil's test.
+@app.route('/compare-two-files', methods=['GET', 'POST'])
+def compare_two_files():
+    # If the page request is GET, simply display the upload page.
+    if (request.method == 'GET'):
+        return render_template('compare_two_files.html', header_tab_classes={'phil-test': 'active'})
+
+    # Otherwise, store the files on the server.
+    if (request.method == 'POST'):
+        savedExpected = save_file(request.files['expected_results'], "e_")
+        savedActual = save_file(request.files['actual_results'], "a_")
+        comparison_results = compare_files(savedExpected, savedActual)
+        if savedExpected and savedActual:
+            return redirect(comparison_results)
+
+    # If anything goes wrong, just return to the upload page for now.
+    return render_template('compare_two_files.html', header_tab_classes={'phil-test': 'active'})
 
 @app.route('/')
 @app.route('/copy-paste-compare', methods=['GET', 'POST'])
@@ -36,6 +79,7 @@ def copy_paste_compare():
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return flask.jsonify(redirect_url=redirect_url)
 
+# Does this work?
 @app.route('/file-compare', methods=['GET', 'POST'])
 def file_compare():
     if request.method == 'GET':
@@ -146,12 +190,6 @@ def show_new_results(comparison_id):
                            report_notes=report_notes,
                            options=options,
                            header_tab_classes={})
-
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'csv'])
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/uploads', methods=['GET', 'POST'])
 def uploads():
