@@ -31,7 +31,7 @@ def load_table_from_xls(filename, worksheet_name=""):
     wb = open_workbook(filename)
 
     for s in wb.sheets():
-        if s.name == worksheet_name:
+        if s.name == worksheet_name or worksheet_name == "":
             t = td_table.TdTable()
             for row_index in range(s.nrows):
                 new_row = []

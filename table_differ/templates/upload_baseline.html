@@ -1,0 +1,22 @@
+{% extends "new_base.html" %}
+
+{% block title %}Upload Baseline{% endblock %}
+
+{% block head %}
+<script src="static/jquery.min.js"></script>
+{% endblock %}
+
+{% block page_content %}
+
+<div class="container-fluid" id="page-content">
+    <h1>Upload Baseline</h1>
+	<form action="/upload/baseline" method="post" enctype="multipart/form-data">
+		<input name="baseline_name" type="text" placeholder="Baseline Name">
+		<input name="baseline_file" type="file">
+		<input type="submit" value="Upload">
+	</form>
+</div>
+
+<script src='static/tables_input.js'></script>
+
+{% endblock %}
