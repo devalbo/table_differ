@@ -10,17 +10,33 @@
 
 <div class="container-fluid" id="page-content">
     <h1>Compare Baseline</h1>
-	<form action="/compare/baseline" method="post" enctype="multipart/form-data">
+	<form action="/compare/baseline" method="post" enctype="multipart/form-data" onsubmit="return isFileSelected();">
 		<select name="baseline_id">
 		{% for baseline in baselines %}
 			<option value="{{ baseline.id }}">{{ baseline.name|striptags|title }}</option>
 		{% endfor %}
 		</select>
-		<input name="compare_file" type="file">
+		<br><br>
+		<input id="compare_file" name="compare_file" type="file">
+		<br><br>
+		{% for comparison in comparison_types %}
+		{% if loop.index == 1 %}
+			<input id="comparison{{ comparison.id }}" type="radio" name="comparison_type" value="{{ comparison.id }}" checked="checked">
+		{% else %}
+			<input id="comparison{{ comparison.id }}" type="radio" name="comparison_type" value="{{ comparison.id }}">
+		{% endif %}
+			<label for="comparison{{ comparison.id }}">{{ comparison.name|striptags|title }}</label>
+		{% endfor %}
+		<br>
 		<input type="submit" value="Upload">
 	</form>
 </div>
 
 <script src='static/tables_input.js'></script>
+<script>
+	function isFileSelected() {
+		return (document.getElementById('compare_file').value !== '');
+	}
+</script>
 
 {% endblock %}

@@ -181,9 +181,9 @@ def upload_baseline():
         baseline_record = models.Baseline.create(
             name=request.form['baseline_name'],
             file=baseline_file.id,
-            settings=1
+            comparison=1
         )
-        return "Success :D"
+        return redirect(url_for('compare_baseline'))
 
     # If there are no files present, display the upload page.
     return render_template('upload_baseline.html',
@@ -194,8 +194,11 @@ def upload_baseline():
 def compare_baseline():
     if request.method == 'GET':
         baselines = models.Baseline.select()
+        if baselines.count() == 0:
+            return 'No baselines exist :('
+        comparison_types = models.ComparisonType.select()
         return render_template('compare_baseline.html',
-            header_tab_classes={'compare-baseline': 'active'}, baselines=baselines)
+            header_tab_classes={'compare-baseline': 'active'}, baselines=baselines, comparison_types=comparison_types)
 
     baseline_id = request.form['baseline_id']
     baseline = models.Baseline.get(models.Baseline.id == baseline_id)
@@ -206,7 +209,8 @@ def compare_baseline():
     expected_results_table = td_parsers.load_table_from_xls(baseline_path)
     actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
 
-    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_LITERAL)
+    comparison_type = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
+    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_type.name)
     comparison_id = td_persist.store_new_comparison(comparison)
 
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)

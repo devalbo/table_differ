@@ -1,7 +1,7 @@
 import re
 
-COMPARE_LITERAL = "COMPARE_LITERAL"
-COMPARE_RE_SKIP = "COMPARE_RE_SKIP"
+COMPARE_LITERAL = "Literal"
+COMPARE_RE_SKIP = "Regular Expression"
 
 class TdComparison:
 
