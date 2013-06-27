@@ -245,6 +245,28 @@ def save_excel_file(file, directory):
 
     raise Exception('The file is not valid!')
 
+@app.route('/test_sheet')
+def test_sheet():
+    return render_template('test_sheet.html',
+                           header_tab_classes={'compare-baseline': 'active'})
+
+@app.route('/test_sheet_data', methods=['GET', 'POST'])
+def test_sheet_data():
+    if request.method == 'GET':
+        t = td_parsers.load_table_from_xls('test_sheet.xls', 'MainSheet')
+        data = []
+        for row in t.rows:
+            data.append(row)
+        response = {"result": "ok",
+                    "data": data}
+        return flask.jsonify(response)
+
+    # if request.method == 'POST':
+    #     baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
+
+
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0',
             port=5005,
