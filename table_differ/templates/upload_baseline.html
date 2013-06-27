@@ -8,15 +8,51 @@
 
 {% block page_content %}
 
-<div class="container-fluid" id="page-content">
-    <h1>Upload Baseline</h1>
-	<form action="/upload/baseline" method="post" enctype="multipart/form-data">
-		<input name="baseline_name" type="text" placeholder="Baseline Name">
-		<input name="baseline_file" type="file">
-		<input type="submit" value="Upload">
-	</form>
+<div class="row-fluid">
+	<div class="form-box span8 offset2">
+		<form action="{{ url_for('upload_baseline') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return isFileSelected();">
+			<fieldset>
+				<div class="form-legend">Upload Baseline</div>
+				<div class="control-group">
+					<label class="control-label">Baseline Name</label>
+					<div class="controls">
+						<input type="text" class="input-block-level span6" name="baseline_name" placeholder="Baseline Name">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Baseline File</label>
+					<div class="controls">
+						<input type="file" name="baseline_file" class="input-block-level" placeholder="Baseline File">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Comparison Type</label>
+					<div class="controls">
+						{% for comparison in comparison_types %}
+						<label class="radio-label">
+							{% if loop.index == 1 %}
+								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison.id }}" checked="checked">
+							{% else %}
+								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison.id }}">
+							{% endif %}
+							{{ comparison.name|striptags|title }}
+						</label>
+						{% endfor %}
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Upload</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
 </div>
 
 <script src='static/tables_input.js'></script>
+<script>
+	function isFileSelected() {
+		return (document.getElementById('compare_file').value !== '');
+	}
+</script>
 
 {% endblock %}
