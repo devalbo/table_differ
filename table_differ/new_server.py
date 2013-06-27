@@ -318,7 +318,6 @@ def save_excel_file(file, directory):
 
     raise Exception('The file is not valid!')
 
-<<<<<<< HEAD
 @app.route('/test_sheet')
 def test_sheet():
     return render_template('test_sheet.html',

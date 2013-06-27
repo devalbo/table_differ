@@ -1,28 +1,5 @@
 {% extends "new_base.html" %}
 
-<<<<<<< .merge_file_hPJkEu
-{% block title %}Table Differ - QC Ref/Act{% endblock %}
-
-{% block head %}
-<script src="static/jquery.min.js"></script>
-{% endblock %}
-
-{% block page_content %}
-<div class="container-fluid" id="page-content">
-    <h1>Upload QC Ref/Act</h1>
-    <div class="row-fluid"> </div>
-    <div class="row-fluid"> </div>
-    <div class="row-fluid"> </div>
-    <form action="" method=post enctype=multipart/form-data>
-        <ul>
-            <li><input type=file name=worksheet_file>Excel Workbook with Reference/Actual worksheets</input></li>
-            <li><input type=submit value=Upload></li>
-        </ul>
-    </form>
-</div>
-
-<script src='static/tables_input.js'></script>
-=======
 {% block title %}QC Ref/Act{% endblock %}
 
 {% block head %}
@@ -56,6 +33,4 @@
 		return (document.getElementById('worksheet_file').value !== '');
 	}
 </script>
->>>>>>> .merge_file_gKVRkg
-
 {% endblock %}
