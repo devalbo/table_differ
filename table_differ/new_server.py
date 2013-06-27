@@ -175,6 +175,23 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
+# Modify a baseline
+@app.route('/manage/baseline', methods=['GET', 'POST'])
+def manage_baselines():
+    # If there are files in the request, store them.
+    if request.method == 'POST':
+        baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
+        baseline_record = models.Baseline.create(
+            name=request.form['baseline_name'],
+            file=baseline_file.id,
+            comparison=1
+        )
+        return redirect(url_for('manage_baselines'))
+
+    # If there are no files present, display the upload page.
+    return render_template('manage_baselines.html',
+                           header_tab_classes={'manage-baseline': 'active'})
+
 # Upload an Excel baseline and store it in the database.
 @app.route('/upload/baseline', methods=['GET', 'POST'])
 def upload_baseline():
