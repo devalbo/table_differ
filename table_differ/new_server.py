@@ -201,13 +201,15 @@ def upload_baseline():
         baseline_record = models.Baseline.create(
             name=request.form['baseline_name'],
             file=baseline_file.id,
-            comparison=1
+            comparison=request.form['comparison_type']
         )
         return redirect(url_for('compare_baseline'))
 
     # If there are no files present, display the upload page.
+    comparison_types = models.ComparisonType.select()
     return render_template('upload_baseline.html',
-                               header_tab_classes={'upload-baseline': 'active'})
+                               header_tab_classes={'upload-baseline': 'active'},
+                               comparison_types=comparison_types)
 
 # Compare a file with an existing baseline.
 @app.route('/compare/baseline', methods=['GET', 'POST'])
@@ -216,12 +218,10 @@ def compare_baseline():
         baselines = models.Baseline.select()
         if baselines.count() == 0:
             return 'No baselines exist :('
-        comparison_types = models.ComparisonType.select()
         return render_template('compare_baseline.html',
-            header_tab_classes={'compare-baseline': 'active'}, baselines=baselines, comparison_types=comparison_types)
+            header_tab_classes={'compare-baseline': 'active'}, baselines=baselines)
 
-    baseline_id = request.form['baseline_id']
-    baseline = models.Baseline.get(models.Baseline.id == baseline_id)
+    baseline = models.Baseline.get(models.Baseline.id == request.form['baseline_id'])
     baseline_path = get_excel_file_path(baseline.file)
 
     actual_file = save_excel_file(request.files['compare_file'], 'actual')

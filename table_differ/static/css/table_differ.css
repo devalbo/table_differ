@@ -1,0 +1,36 @@
+.mismatch { background-color:red; color:white; }
+.ok { background-color:#33FF99; color:black; }
+.missing_expected { background-color: red; color: white; }
+.missing_actual { background-color: red; color: white; }
+.padding { background-color: white; color: white; }
+
+div#page-content {
+	background-color: #fdfdfd;
+}
+div#page-footer {
+	color: #b0b0b0;
+	border-top: 1px solid #e5e5e5;
+	border-bottom: 1px solid #f4f4f4;
+	font-family: sans-serif;
+	font-size: 9pt;
+	padding: 3px;
+	text-align: center;
+}
+form, .form-actions {
+	margin-bottom: 0;
+}
+div.form-box {
+	border-left: 1px solid #e5e5e5;
+	border-right: 1px solid #e5e5e5;
+}
+.form-legend {
+	background-color: #fafafa;
+	border-bottom: 1px solid #e5e5e5;
+	color: #333333;
+	font-size: 16pt;
+	padding: 15px 0 10px 15px;
+	margin-bottom: 30px;
+}
+.radio-button {
+	margin: 0 0 3px 0 !important;
+}

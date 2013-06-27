@@ -7,7 +7,7 @@
   {% block head %} {% endblock %}
   {% block style %}
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='table_differ.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/table_differ.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <link data-jsfiddle="common" rel="stylesheet" media="screen" href="{{ url_for('static', filename='jquery.handsontable.bootstrap.css') }}">
@@ -16,7 +16,7 @@
 
 <body> 
 {% block content %}
-<div class="navbar navbar-fixed-top">
+<div class="navbar navbar-static-top">
     <div class="navbar-inner">
         <div class="container">
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -40,9 +40,13 @@
         </div>
     </div>
 </div>
-
-{% block page_content %}Put page content here{% endblock %}
+<div id="page-content">
+	{% block page_content %}Put page content here{% endblock %}
+</div>
 
 {% endblock %}
+
+<div id="page-footer">2013 Chatham Financial Corp.
+</div>
 </body>
 </html> 
