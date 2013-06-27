@@ -182,9 +182,56 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
-# Modify a baseline
-@app.route('/manage/baseline', methods=['GET', 'POST'])
+# Perform a quick comparison between two Excel files.
+@app.route('/compare/quick', methods=['GET', 'POST'])
+def quick_compare():
+    if request.method == 'GET':
+        comparison_types = models.ComparisonType.select()
+        return render_template('quick_compare.html',
+            header_tab_classes={'quick-compare': 'active'}, comparison_types=comparison_types)
+
+    baseline_file = save_excel_file(request.files['baseline_file'], 'actual')
+    actual_file = save_excel_file(request.files['comparison_file'], 'actual')
+
+    expected_results_table = td_parsers.load_table_from_xls(get_excel_file_path(baseline_file.id))
+    actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
+
+    comparison_record = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
+    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
+    comparison_id = td_persist.store_new_comparison(comparison)
+
+    # Note: We could delete the files once we're done with a quick comparison.
+
+    redirect_url = url_for('show_new_results', comparison_id=comparison_id)
+    return redirect(redirect_url)
+
+# Manage a baseline with the specified baseline ID.
+@app.route('/baseline/manage/<int:baseline_id>', methods=['GET'])
+def manage_baseline_view(baseline_id):
+    baselines = models.Baseline.select()
+    if baselines.count() == 0:
+        return display_error('There are no baselines on the server. Please upload a baseline first.')
+    return render_template('manage_baselines.html',
+        header_tab_classes={'manage-baseline': 'active'}, baselines=baselines, selected_baseline=baseline_id)
+
+@app.route('/baseline/data', methods=['POST'])
+def get_baseline_grid_data():
+    baseline = models.Baseline.get(models.Baseline.id == request.form['baseline_id'])
+    file_path = get_excel_file_path(baseline.file)
+    t = td_parsers.load_table_from_xls(file_path)
+    data = []
+    for row in t.rows:
+        data.append(row)
+    response = {"result": "ok",
+                "data": data}
+    return flask.jsonify(response)
+
+# Manage a baseline
+@app.route('/baseline/manage', methods=['GET', 'POST'])
 def manage_baselines():
+    if request.method == 'GET':
+        return manage_baseline_view(None)
+
     # If there are files in the request, store them.
     if request.method == 'POST':
         baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
@@ -193,14 +240,11 @@ def manage_baselines():
             file=baseline_file.id,
             comparison=1
         )
-        return redirect(url_for('manage_baselines'))
 
-    # If there are no files present, display the upload page.
-    return render_template('manage_baselines.html',
-                           header_tab_classes={'manage-baseline': 'active'})
+    return redirect(url_for('manage_baselines'))
 
 # Upload an Excel baseline and store it in the database.
-@app.route('/upload/baseline', methods=['GET', 'POST'])
+@app.route('/baseline/upload', methods=['GET', 'POST'])
 def upload_baseline():
     # If there are files in the request, store them.
     if request.method == 'POST':
@@ -210,7 +254,7 @@ def upload_baseline():
             file=baseline_file.id,
             comparison=request.form['comparison_type']
         )
-        return redirect(url_for('compare_baseline'))
+        return redirect(url_for('compare_baseline') + '/' + str(baseline_record.id))
 
     # If there are no files present, display the upload page.
     comparison_types = models.ComparisonType.select()
@@ -219,14 +263,10 @@ def upload_baseline():
                                comparison_types=comparison_types)
 
 # Compare a file with an existing baseline.
-@app.route('/compare/baseline', methods=['GET', 'POST'])
+@app.route('/baseline/compare', methods=['GET', 'POST'])
 def compare_baseline():
     if request.method == 'GET':
-        baselines = models.Baseline.select()
-        if baselines.count() == 0:
-            return 'No baselines exist :('
-        return render_template('compare_baseline.html',
-            header_tab_classes={'compare-baseline': 'active'}, baselines=baselines)
+        return compare_baseline_view(None)
 
     baseline = models.Baseline.get(models.Baseline.id == request.form['baseline_id'])
     baseline_path = get_excel_file_path(baseline.file)
@@ -236,12 +276,21 @@ def compare_baseline():
     expected_results_table = td_parsers.load_table_from_xls(baseline_path)
     actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
 
-    comparison_type = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
-    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_type.name)
+    # Note: Could we join here using the ORM instead?
+    comparison_record = models.ComparisonType.get(models.ComparisonType.id == baseline.comparison)
+    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
     comparison_id = td_persist.store_new_comparison(comparison)
 
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return redirect(redirect_url)
+
+@app.route('/baseline/compare/<int:baseline_id>', methods=['GET'])
+def compare_baseline_view(baseline_id):
+    baselines = models.Baseline.select()
+    if baselines.count() == 0:
+        return display_error('There are no baselines on the server. Please upload a baseline first.')
+    return render_template('compare_baseline.html',
+        header_tab_classes={'compare-baseline': 'active'}, baselines=baselines, selected_baseline=baseline_id)
 
 def get_excel_file_path(file_id):
     file_record = models.UploadedFile.get(models.UploadedFile.id == file_id)
@@ -269,6 +318,7 @@ def save_excel_file(file, directory):
 
     raise Exception('The file is not valid!')
 
+<<<<<<< HEAD
 @app.route('/test_sheet')
 def test_sheet():
     return render_template('test_sheet.html',
@@ -332,6 +382,10 @@ def show_new_results_data(comparison_id):
                         }
                 }
     return flask.jsonify(response)
+
+
+def display_error(error_message):
+    return render_template('error.html', header_tab_classes=None, error_message=error_message)
 
 
 admin.setup()

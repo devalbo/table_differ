@@ -1,5 +1,6 @@
 {% extends "new_base.html" %}
 
+<<<<<<< .merge_file_hPJkEu
 {% block title %}Table Differ - QC Ref/Act{% endblock %}
 
 {% block head %}
@@ -21,5 +22,40 @@
 </div>
 
 <script src='static/tables_input.js'></script>
+=======
+{% block title %}QC Ref/Act{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row-fluid">
+	<div class="form-box span8 offset2">
+		<form action="" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return isFileSelected();">
+			<fieldset>
+				<div class="form-legend">Upload QC Ref/Act</div>
+				<div class="control-group">
+					<label class="control-label">Comparison File</label>
+					<div class="controls">
+						<input id="worksheet_file" type="file" name="worksheet_file" class="input-block-level" placeholder="Worksheet File">
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Compare</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='tables_input.js') }}"></script>
+<script>
+	function isFileSelected() {
+		return (document.getElementById('worksheet_file').value !== '');
+	}
+</script>
+>>>>>>> .merge_file_gKVRkg
 
 {% endblock %}
