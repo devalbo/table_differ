@@ -3,7 +3,7 @@
 {% block title %}Compare to Baseline{% endblock %}
 
 {% block head %}
-<script src="static/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 {% endblock %}
 
 {% block page_content %}
@@ -18,7 +18,11 @@
 					<div class="controls">
 						<select name="baseline_id" class="span6">
 						{% for baseline in baselines %}
+							{% if selected_baseline and baseline.id == selected_baseline %}
+							<option value="{{ baseline.id }}" selected="selected">{{ baseline.name|striptags|title }}</option>
+							{% else %}
 							<option value="{{ baseline.id }}">{{ baseline.name|striptags|title }}</option>
+							{% endif %}
 						{% endfor %}
 						</select>
 					</div>

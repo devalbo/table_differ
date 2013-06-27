@@ -34,3 +34,11 @@ div.form-box {
 .radio-button {
 	margin: 0 0 3px 0 !important;
 }
+
+.error-box {
+	background-color: #fafafa;
+	border: 1px solid #e5e5e5;
+	border-radius: 15px;
+	margin: 20px;
+	padding: 15px;
+}
