@@ -1,27 +1,40 @@
 {% extends "new_base.html" %}
 
-{% block title %}Table Differ{% endblock %}
+{% block title %}Compare Tables{% endblock %}
 
 {% block head %}
-<script src="static/jquery.min.js"></script>
-<script src="static/jquery.handsontable.full.js"></script>
-<link rel="stylesheet" media="screen" href="static/jquery.handsontable.full.css">
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.handsontable.full.js') }}"></script>
+<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='jquery.handsontable.full.css') }}">
 {% endblock %}
 
 {% block page_content %}
-<div class="container-fluid" id="page-content">
-    <div class="row-fluid"> </div>
-    <div class="row-fluid"> </div>
-    <div class="row-fluid"> </div>
-    <div class="row-fluid">
-    Table of Expected Results
-    <div id="dataTable1" class="handsontable"></div>
-    Table of Actual Results
-    <div id="dataTable2" class="handsontable"></div>
-    <button id="compare">Compare</button>
-    </div>
+
+<div class="row-fluid">
+	<div class="form-box span8 offset2">
+		<form action="{{ url_for('compare_baseline') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return false;">
+			<fieldset>
+				<div class="form-legend">Compare Tables</div>
+				<div class="control-group">
+					<label class="control-label">Baseline Table</label>
+					<div class="controls">
+						<div id="dataTable1" class="handsontable"></div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Comparison Table</label>
+					<div class="controls">
+						<div id="dataTable2" class="handsontable"></div>
+					</div>
+				</div>
+				<div class="form-actions">
+					<button id="compare" class="btn btn-primary">Compare</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
 </div>
 
-<script src='static/tables_input.js'></script>
+<script src="{{ url_for('static', filename='tables_input.js') }}"></script>
 
 {% endblock %}
