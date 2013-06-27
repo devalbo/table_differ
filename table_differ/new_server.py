@@ -175,9 +175,33 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
-# Modify a baseline
-@app.route('/manage/baseline', methods=['GET', 'POST'])
+# Manage a baseline with the specified baseline ID.
+@app.route('/baseline/manage/<int:baseline_id>', methods=['GET'])
+def manage_baseline_view(baseline_id):
+    baselines = models.Baseline.select()
+    if baselines.count() == 0:
+        return display_error('There are no baselines on the server. Please upload a baseline first.')
+    return render_template('manage_baselines.html',
+        header_tab_classes={'manage-baseline': 'active'}, baselines=baselines, selected_baseline=baseline_id)
+
+@app.route('/baseline/data', methods=['POST'])
+def get_baseline_grid_data():
+    baseline = models.Baseline.get(models.Baseline.id == request.form['baseline_id'])
+    file_path = get_excel_file_path(baseline.file)
+    t = td_parsers.load_table_from_xls(file_path)
+    data = []
+    for row in t.rows:
+        data.append(row)
+    response = {"result": "ok",
+                "data": data}
+    return flask.jsonify(response)
+
+# Manage a baseline
+@app.route('/baseline/manage', methods=['GET', 'POST'])
 def manage_baselines():
+    if request.method == 'GET':
+        return manage_baseline_view(None)
+
     # If there are files in the request, store them.
     if request.method == 'POST':
         baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
@@ -186,14 +210,11 @@ def manage_baselines():
             file=baseline_file.id,
             comparison=1
         )
-        return redirect(url_for('manage_baselines'))
 
-    # If there are no files present, display the upload page.
-    return render_template('manage_baselines.html',
-                           header_tab_classes={'manage-baseline': 'active'})
+    return redirect(url_for('manage_baselines'))
 
 # Upload an Excel baseline and store it in the database.
-@app.route('/upload/baseline', methods=['GET', 'POST'])
+@app.route('/baseline/upload', methods=['GET', 'POST'])
 def upload_baseline():
     # If there are files in the request, store them.
     if request.method == 'POST':
@@ -212,7 +233,7 @@ def upload_baseline():
                                comparison_types=comparison_types)
 
 # Compare a file with an existing baseline.
-@app.route('/compare/baseline', methods=['GET', 'POST'])
+@app.route('/baseline/compare', methods=['GET', 'POST'])
 def compare_baseline():
     if request.method == 'GET':
         return compare_baseline_view(None)
@@ -233,7 +254,7 @@ def compare_baseline():
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return redirect(redirect_url)
 
-@app.route('/compare/baseline/<int:baseline_id>', methods=['GET'])
+@app.route('/baseline/compare/<int:baseline_id>', methods=['GET'])
 def compare_baseline_view(baseline_id):
     baselines = models.Baseline.select()
     if baselines.count() == 0:
@@ -266,25 +287,6 @@ def save_excel_file(file, directory):
         return file_record
 
     raise Exception('The file is not valid!')
-
-@app.route('/test_sheet', methods=['GET'])
-def test_sheet():
-    return render_template('test_sheet.html',
-                           header_tab_classes={'compare-baseline': 'active'})
-
-@app.route('/test_sheet_data', methods=['GET', 'POST'])
-def test_sheet_data():
-    if request.method == 'GET':
-        t = td_parsers.load_table_from_xls('test_sheet.xls', 'MainSheet')
-        data = []
-        for row in t.rows:
-            data.append(row)
-        response = {"result": "ok",
-                    "data": data}
-        return flask.jsonify(response)
-
-    # if request.method == 'POST':
-    #     baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
 
 def display_error(error_message):
     return render_template('error.html', header_tab_classes=None, error_message=error_message)
