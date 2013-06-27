@@ -14,7 +14,33 @@ for (var i = 0; i < dataTableIds.length; i++) {
 		startRows: 6,
 		startCols: 8,
 		minSpareRows: 1,
-		minSpareCols: 1
+		minSpareCols: 1,
+		contextMenu:
+				{
+					callback: function (key, options) {
+					  if (key === 'ignore') {
+						setTimeout(function () {
+						  //timeout is used to make sure the menu collapsed before alert is shown
+						  alert("Will add code to call back to td_persist");
+						}, 100);
+					  }
+					},
+					items: {
+						"ignore": {name: 'Ignore Cell Differences'},
+						"hsep": "---------",
+						"row_above": {},
+						"row_below": {},
+						"hsep1": "---------",
+						"col_left": {},
+						"col_right": {},
+						"hsep2": "---------",
+						"remove_row": {},
+						"remove_col": {},
+						"hsep3": "---------",
+						"undo": {},
+						"redo": {}
+					}
+				}
 	});
 	handsonDataTables[i] = $(dataTableJqueryId).data('handsontable');
 //    $('#dataTable1 table').addClass('table');
