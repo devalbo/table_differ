@@ -6,6 +6,7 @@ import td_parsers
 import td_persist
 import td_comparison
 import datetime
+from admin import admin
 
 import flask
 from flask import render_template
@@ -153,11 +154,17 @@ def show_new_results(comparison_id):
 
         table_rows.append(table_row)
 
-    return render_template('data_comparison_new_results.html',
+    # return render_template('data_comparison_new_results.html',
+    #                        table_rows=table_rows,
+    #                        report_notes=report_notes,
+    #                        options=options,
+    #                        header_tab_classes={})
+    return render_template('data_comparison_new_results2.html',
                            table_rows=table_rows,
                            report_notes=report_notes,
                            options=options,
-                           header_tab_classes={})
+                           header_tab_classes={},
+                           comparison_id=comparison_id)
 
 @app.route('/uploads', methods=['GET', 'POST'])
 def uploads():
@@ -278,11 +285,56 @@ def test_sheet_data():
                     "data": data}
         return flask.jsonify(response)
 
-    # if request.method == 'POST':
-    #     baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
+@app.route('/data/new_results/<comparison_id>', methods=['GET'])
+def show_new_results_data(comparison_id):
+    # t = td_parsers.load_table_from_xls('test_sheet.xls', 'MainSheet')
+    # data = []
+    # for row in t.rows:
+    #     data.append(row)
+    # cell_statuses = [str(c) for c in comparison._diff_cells]
+
+    comparison = td_persist.retrieve_results(comparison_id)
+
+    items = []
+    item_styles = []
+    for row_index in range(comparison.max_rows):
+        items_row = []
+        item_styles_row = []
+        for col_index in range(comparison.max_cols):
+            if (row_index, col_index) in comparison.same_cells:
+                items_row.append(comparison.same_cells[(row_index, col_index)])
+                item_styles_row.append("ok")
+            elif (row_index, col_index) in comparison.diff_cells:
+                items_row.append(Markup("Expected: %s<br>Actual: %s" %
+                               comparison.diff_cells[(row_index, col_index)]))
+                item_styles_row.append("mismatch")
+            elif (row_index, col_index) in comparison.expected_table_only_cells:
+                items_row.append(Markup("Expected: %s<br>Actual: --missing--" %
+                               comparison.expected_table_only_cells[(row_index, col_index)]))
+                item_styles_row.append("missing_expected")
+            elif (row_index, col_index) in comparison.actual_table_only_cells:
+                items_row.append(Markup("Expected: --missing--<br>Actual: %s" %
+                               comparison.actual_table_only_cells[(row_index, col_index)]))
+                item_styles_row.append("missing_actual")
+            elif (row_index, col_index) in comparison.neither_table_cell_coords:
+                items_row.append("")
+                item_styles_row.append("padding")
+            else:
+                raise Exception("Untreated cell: %s" % ((row_index, col_index)))
+
+        items.append(items_row)
+        item_styles.append(item_styles_row)
 
 
+    response = {"result": "ok",
+                "data": {"cells": items,
+                         "cell_statuses": item_styles,
+                        }
+                }
+    return flask.jsonify(response)
 
+
+admin.setup()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',
