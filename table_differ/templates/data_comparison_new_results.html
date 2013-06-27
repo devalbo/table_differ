@@ -2,45 +2,73 @@
 
 {% block title %}Data Comparison Results{% endblock %}
 
+{% block head %}
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.handsontable.full.js') }}"></script>
+<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='jquery.handsontable.full.css') }}">
+{% endblock %}
+
 {% block page_content %}
 <div class="container-fluid" id="page-content">
 
-{% if options.show_row_col_labels %}
-  <h1>Report Notes</h1>
+    <h1>Results</h1>
+    <div class="bs-docs-example">
+        <ul id="myTab" class="nav nav-pills">
+          <li class="active"><a href="#summary" data-toggle="tab">Summary</a></li>
+          <li><a href="#results" data-toggle="tab">Grid Comparison</a></li>
+          <li><a href="#actual" data-toggle="tab">Actual Table</a></li>
+          <li><a href="#expected" data-toggle="tab">Expected Table</a></li>
+        </ul>
 
-  <ul>
-  {% for report_note in report_notes %}
-      <li>{{ report_note }}</li>
-  {% endfor %}
-  </ul>
-{% endif %}
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="summary">
+                <ul>
+                    {% for report_note in report_notes %}
+                    <li>{{ report_note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="results">
+                <table border="1">
 
-<table border="1">
+                    {% if options.show_row_col_labels %}
+                    <tr>
+                        <td/>
+                        {% for cell in table_rows[0] %}
+                        <td>{{ loop.index }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endif %}
 
-{% if options.show_row_col_labels %}
-<tr>
-<td/>
-{% for cell in table_rows[0] %}
-	<td>{{ loop.index }}</td>
-{% endfor %}
-</tr>
-{% endif %}
+                    {% for row in table_rows %}
+                    <tr>
+                        {% if options.show_row_col_labels %}
+                        <td>{{ loop.index }}</td>
+                        {% endif %}
 
-{% for row in table_rows %}
-<tr>
-	{% if options.show_row_col_labels %}
-		<td>{{ loop.index }}</td>
-	{% endif %}
-	
-	{% for cell in row %}
-		<td class="{{ cell[1] }}">
-		{{ cell[0] }}
-		</td>
-	{% endfor %}
-</tr>
-{% endfor %}
-</table>
-</p>
+                        {% for cell in row %}
+                        <td class="{{ cell[1] }}">
+                            {{ cell[0] }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="tab-pane fade" id="actual">
+                <ul>
+                    <li>actual</li>
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="expected">
+                <ul>
+                    <li>expected</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </div>
+
 {% endblock %}
 

@@ -86,12 +86,14 @@ class TdComparison:
 
     def _do_compare_literal(self):
         def literal_compare_func(expected_value, actual_value):
-            return expected_value == actual_value
+            return expected_value.strip() == actual_value.strip()
 
         return self._do_compare(literal_compare_func)
 
     def _do_compare_re_skip(self):
         def re_compare_func(expected_value, actual_value):
+            if expected_value.upper() == "<SKIP>":
+                return True
             rx = re.compile("^%s$" % expected_value)
             return rx.match(actual_value) is not None
 
