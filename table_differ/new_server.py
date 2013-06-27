@@ -175,6 +175,29 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
+# Perform a quick comparison between two Excel files.
+@app.route('/compare/quick', methods=['GET', 'POST'])
+def quick_compare():
+    if request.method == 'GET':
+        comparison_types = models.ComparisonType.select()
+        return render_template('quick_compare.html',
+            header_tab_classes={'quick-compare': 'active'}, comparison_types=comparison_types)
+
+    baseline_file = save_excel_file(request.files['baseline_file'], 'actual')
+    actual_file = save_excel_file(request.files['comparison_file'], 'actual')
+
+    expected_results_table = td_parsers.load_table_from_xls(get_excel_file_path(baseline_file.id))
+    actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
+
+    comparison_record = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
+    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
+    comparison_id = td_persist.store_new_comparison(comparison)
+
+    # Note: We could delete the files once we're done with a quick comparison.
+
+    redirect_url = url_for('show_new_results', comparison_id=comparison_id)
+    return redirect(redirect_url)
+
 # Manage a baseline with the specified baseline ID.
 @app.route('/baseline/manage/<int:baseline_id>', methods=['GET'])
 def manage_baseline_view(baseline_id):
