@@ -16,7 +16,7 @@ var handsontable = $container.data('handsontable');
 $('#compare').click(function() {
 
 	$.ajax({
-	  url: "test_sheet_data",
+	  url: "/test_sheet_data",
 	  dataType: 'json',
 	  contentType: 'application/json',
 	  type: 'GET',
