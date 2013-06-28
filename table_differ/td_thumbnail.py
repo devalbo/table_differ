@@ -1,7 +1,7 @@
 __author__ = 'ajb'
 
 import os
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 from app import app
 
 THUMBNAIL_DIR = os.path.join(app.config['STORAGE_LOCATION'],
@@ -11,21 +11,28 @@ THUMBNAIL_DIR = os.path.join(app.config['STORAGE_LOCATION'],
 def create_comparison_image(comparison, comparison_id):
 
     im = Image.new("RGB", (comparison.max_cols, comparison.max_rows), "orange")
-    # im = Image.new("RGB", ((comparison.max_cols * 2) + 1, (comparison.max_rows * 2) + 1), "orange")
     draw = ImageDraw.Draw(im)
 
-    MATCH_COLOR = "green"
-    DIFF_COLOR = "red"
-    ONE_TABLE_ONLY_COLOR = "red"
+    MATCH1_COLOR = "#33FF99"
+    MATCH2_COLOR = "#2EE68A"
+    DIFF1_COLOR = "red"
+    DIFF2_COLOR = "#E60000"
+    ONE_TABLE_ONLY_COLOR = "orange"
     PADDING_COLOR = "yellow"
 
     for row_index in range(comparison.max_rows):
         for col_index in range(comparison.max_cols):
             if (row_index, col_index) in comparison.same_cells:
-                draw.point((col_index, row_index), MATCH_COLOR)
+                if (row_index + col_index) % 2 == 0:
+                    draw.point((col_index, row_index), MATCH1_COLOR)
+                else:
+                    draw.point((col_index, row_index), MATCH2_COLOR)
 
             elif (row_index, col_index) in comparison.diff_cells:
-                draw.point((col_index, row_index), DIFF_COLOR)
+                if (row_index + col_index) % 2 == 0:
+                    draw.point((col_index, row_index), DIFF1_COLOR)
+                else:
+                    draw.point((col_index, row_index), DIFF2_COLOR)
 
             elif (row_index, col_index) in comparison.expected_table_only_cells:
                 draw.point((col_index, row_index), ONE_TABLE_ONLY_COLOR)
@@ -41,7 +48,9 @@ def create_comparison_image(comparison, comparison_id):
 
     del draw
 
-    im.resize((400, 400), Image.BICUBIC)
+    width = 600
+    height = (width / comparison.max_cols) * comparison.max_rows
+    im = im.resize((width, height))
 
     save_location = os.path.join(THUMBNAIL_DIR,
                                  "%s.png" % comparison_id)
