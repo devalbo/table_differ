@@ -5,6 +5,7 @@ import td_config
 import td_parsers
 import td_persist
 import td_comparison
+import td_thumbnail
 import datetime
 from admin import admin
 
@@ -38,6 +39,7 @@ def copy_paste_compare():
 
     comparison = compare_data.compare_tables(table1, table2, td_comparison.COMPARE_LITERAL)
     comparison_id = td_persist.store_new_comparison(comparison)
+    td_thumbnail.create_comparison_image(comparison, comparison_id)
 
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return flask.jsonify(redirect_url=redirect_url)
@@ -77,6 +79,7 @@ def xls_worksheet_compare():
 
         comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
         comparison_id = td_persist.store_new_comparison(comparison)
+        td_thumbnail.create_comparison_image(comparison, comparison_id)
 
         redirect_url = url_for('show_new_results', comparison_id=comparison_id)
         return redirect(redirect_url)
@@ -121,11 +124,16 @@ def show_new_results(comparison_id):
                                                                              len(comparison.same_cells))
         report_notes.append(report_note)
 
-    for cell in comparison.diff_cells:
+    cd = comparison.diff_cells.keys()[:]
+    cd.sort()
+    for cell in cd:
         report_notes.append("[%s,%s] Expected: %s Actual: %s" %
                             (cell[0], cell[1],
                              comparison.expected_table.get_value(cell[0], cell[1]),
                              comparison.actual_table.get_value(cell[0], cell[1])))
+
+    if len(report_notes) == 0:
+        report_notes.append("No differences between expected and actual tables")
 
     table_rows = []
     for row_index in range(comparison.max_rows):
@@ -199,6 +207,7 @@ def quick_compare():
     comparison_record = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
     comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
     comparison_id = td_persist.store_new_comparison(comparison)
+    td_thumbnail.create_comparison_image(comparison, comparison_id)
 
     # Note: We could delete the files once we're done with a quick comparison.
 
@@ -381,6 +390,13 @@ def show_new_results_data(comparison_id):
                         }
                 }
     return flask.jsonify(response)
+
+
+@app.route('/thumbnails/<comparison_id>', methods=['GET'])
+def thumbnails(comparison_id):
+    return send_from_directory(td_thumbnail.THUMBNAIL_DIR,
+                               "%s.png" % comparison_id)
+
 
 
 def display_error(error_message):
