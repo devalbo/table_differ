@@ -289,6 +289,7 @@ def compare_baseline():
     comparison_record = models.ComparisonType.get(models.ComparisonType.id == baseline.comparison)
     comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
     comparison_id = td_persist.store_new_comparison(comparison)
+    td_thumbnail.create_comparison_image(comparison, comparison_id)
 
     redirect_url = url_for('show_new_results', comparison_id=comparison_id)
     return redirect(redirect_url)
