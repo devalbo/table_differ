@@ -33,7 +33,7 @@ def allowed_file(filename):
 @app.route('/copy-paste-compare', methods=['GET', 'POST'])
 def copy_paste_compare():
     if request.method == 'GET':
-        return render_template('new_tables_input.html',
+        return render_template('tables_input.html',
                                header_tab_classes={'copy-paste-compare': 'active'})
 
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
@@ -45,20 +45,6 @@ def copy_paste_compare():
 
     redirect_url = url_for('show_results', comparison_id=comparison_id)
     return jsonify(redirect_url=redirect_url)
-
-@app.route('/file-compare', methods=['GET', 'POST'])
-def file_compare():
-    if request.method == 'GET':
-        return render_template('file_compare.html',
-                               header_tab_classes={'file-compare': 'active'})
-
-    actual_results_file = request.files['actual_results']
-    expected_results_file = request.files['expected_results']
-    for results_file in (actual_results_file, expected_results_file):
-        if results_file and allowed_file(results_file.filename):
-            filename = secure_filename(results_file.filename)
-            results_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return redirect(url_for('file_compare'))
 
 @app.route('/xls-worksheet-compare', methods=['GET', 'POST'])
 def xls_worksheet_compare():
@@ -86,18 +72,6 @@ def xls_worksheet_compare():
         return redirect(redirect_url)
 
     return redirect(url_for('xls_worksheet_compare'))
-
-@app.route('/compare', methods=['GET', 'POST'])
-def compare():
-    if request.method == 'GET':
-        return render_template('full_compare.html',
-                               header_tab_classes={'table-compare': 'active'})
-
-@app.route('/manage-tables', methods=['GET', 'POST'])
-def manage_tables():
-    if request.method == 'GET':
-        return render_template('manage-tables.html',
-                               header_tab_classes={'manage-tables': 'active'})
 
 @app.route('/results/<comparison_id>', methods=['GET'])
 def show_results(comparison_id):
@@ -163,33 +137,12 @@ def show_results(comparison_id):
 
         table_rows.append(table_row)
 
-    # return render_template('data_comparison_new_results.html',
-    #                        table_rows=table_rows,
-    #                        report_notes=report_notes,
-    #                        options=options,
-    #                        header_tab_classes={})
-    return render_template('data_comparison_new_results2.html',
+    return render_template('comparison_results.html',
                            table_rows=table_rows,
                            report_notes=report_notes,
                            options=options,
                            header_tab_classes={},
                            comparison_id=comparison_id)
-
-@app.route('/uploads', methods=['GET', 'POST'])
-def uploads():
-    if request.method == 'POST':
-        file1 = request.files['file1']
-        if file1 and allowed_file(file1.filename):
-            filename = secure_filename(file1.filename)
-            file1.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
-    return render_template("uploads.html")
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
 
 # Perform a quick comparison between two Excel files.
 @app.route('/compare/quick', methods=['GET', 'POST'])
@@ -331,12 +284,6 @@ def save_excel_file(file, directory):
 
 @app.route('/data/new_results/<comparison_id>', methods=['GET'])
 def show_new_results_data(comparison_id):
-    # t = td_parsers.load_table_from_xls('test_sheet.xls', 'MainSheet')
-    # data = []
-    # for row in t.rows:
-    #     data.append(row)
-    # cell_statuses = [str(c) for c in comparison._diff_cells]
-
     comparison = td_persist.retrieve_results(comparison_id)
 
     items = []
