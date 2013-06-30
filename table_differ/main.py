@@ -1,16 +1,8 @@
-import compare_data
 import os
-import models
-import td_config
-import td_parsers
-import td_persist
-import td_comparison
-import td_thumbnail
 import datetime
-from admin import admin
 
-import flask
 from flask import render_template
+from flask import jsonify
 from flask import request
 from flask import url_for
 from flask import redirect
@@ -19,6 +11,16 @@ from flask import send_from_directory
 
 from werkzeug import secure_filename
 
+import compare_data
+import models
+import td_config
+import td_parsers
+import td_persist
+import td_comparison
+import td_thumbnail
+
+from admin import admin
+from api import api
 from app import app
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
@@ -42,9 +44,8 @@ def copy_paste_compare():
     td_thumbnail.create_comparison_image(comparison, comparison_id)
 
     redirect_url = url_for('show_results', comparison_id=comparison_id)
-    return flask.jsonify(redirect_url=redirect_url)
+    return jsonify(redirect_url=redirect_url)
 
-# Does this work?
 @app.route('/file-compare', methods=['GET', 'POST'])
 def file_compare():
     if request.method == 'GET':
@@ -233,7 +234,7 @@ def get_baseline_grid_data():
         data.append(row)
     response = {"result": "ok",
                 "data": data}
-    return flask.jsonify(response)
+    return jsonify(response)
 
 # Manage a baseline
 @app.route('/baseline/manage', methods=['GET', 'POST'])
@@ -374,7 +375,7 @@ def show_new_results_data(comparison_id):
                          "cell_statuses": item_styles,
                         }
                 }
-    return flask.jsonify(response)
+    return jsonify(response)
 
 @app.route('/thumbnails/<comparison_id>', methods=['GET'])
 def thumbnails(comparison_id):
@@ -384,8 +385,8 @@ def thumbnails(comparison_id):
 def display_error(error_message):
     return render_template('error.html', header_tab_classes=None, error_message=error_message)
 
-api.setup()
 admin.setup()
+api.setup()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',
