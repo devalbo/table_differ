@@ -3,7 +3,7 @@
 {% block title %}Error{% endblock %}
 
 {% block head %}
-<script src="static/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 {% endblock %}
 
 {% block page_content %}

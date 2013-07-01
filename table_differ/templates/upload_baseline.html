@@ -3,7 +3,7 @@
 {% block title %}Upload Baseline{% endblock %}
 
 {% block head %}
-<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 {% endblock %}
 
 {% block page_content %}
@@ -48,7 +48,7 @@
 	</div>
 </div>
 
-<script src='static/tables_input.js'></script>
+<script src="{{ url_for('static', filename='js/tables_input.js') }}"></script>
 <script>
 	function isFileSelected() {
 		return (document.getElementById('compare_file').value !== '');

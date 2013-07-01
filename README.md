@@ -29,4 +29,4 @@ https://zignar.net/2012/06/17/install-python-on-windows/
 > pip install -r requirements.txt
 
 * Run the server
-> python new_server.py
+> python main.py

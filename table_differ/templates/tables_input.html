@@ -3,9 +3,9 @@
 {% block title %}Compare Tables{% endblock %}
 
 {% block head %}
-<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.handsontable.full.js') }}"></script>
-<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='jquery.handsontable.full.css') }}">
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.handsontable.full.js') }}"></script>
+<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='css/jquery.handsontable.full.css') }}">
 {% endblock %}
 
 {% block page_content %}
@@ -35,6 +35,6 @@
 	</div>
 </div>
 
-<script src="{{ url_for('static', filename='tables_input.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tables_input.js') }}"></script>
 
 {% endblock %}

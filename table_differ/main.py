@@ -11,7 +11,6 @@ from flask import send_from_directory
 
 from werkzeug import secure_filename
 
-import compare_data
 import models
 import td_config
 import td_parsers
@@ -39,7 +38,7 @@ def copy_paste_compare():
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
 
-    comparison = compare_data.compare_tables(table1, table2, td_comparison.COMPARE_LITERAL)
+    comparison = td_comparison.compare_tables(table1, table2, td_comparison.COMPARE_LITERAL)
     comparison_id = td_persist.store_new_comparison(comparison)
     td_thumbnail.create_comparison_image(comparison, comparison_id)
 
@@ -64,7 +63,7 @@ def xls_worksheet_compare():
         expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
         actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
 
-        comparison = compare_data.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
+        comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
         comparison_id = td_persist.store_new_comparison(comparison)
         td_thumbnail.create_comparison_image(comparison, comparison_id)
 
@@ -159,7 +158,7 @@ def quick_compare():
     actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
 
     comparison_record = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
-    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
+    comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
     comparison_id = td_persist.store_new_comparison(comparison)
     td_thumbnail.create_comparison_image(comparison, comparison_id)
 
@@ -241,7 +240,7 @@ def compare_baseline():
 
     # Note: Could we join here using the ORM instead?
     comparison_record = models.ComparisonType.get(models.ComparisonType.id == baseline.comparison)
-    comparison = compare_data.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
+    comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
     comparison_id = td_persist.store_new_comparison(comparison)
     td_thumbnail.create_comparison_image(comparison, comparison_id)
 

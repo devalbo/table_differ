@@ -3,6 +3,13 @@ import re
 COMPARE_LITERAL = "Literal"
 COMPARE_RE_SKIP = "Regular Expression"
 
+
+def compare_tables(t1, t2, comparator):
+    comparison = TdComparison(t1, t2)
+    comparison.do_comparison(comparator)
+    return comparison
+
+
 class TdComparison:
 
     def __init__(self, expected_table, actual_table):
