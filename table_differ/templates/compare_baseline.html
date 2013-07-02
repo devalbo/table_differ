@@ -1,35 +1,44 @@
 {% extends "new_base.html" %}
 
-{% block title %}Compare Baseline{% endblock %}
+{% block title %}Compare to Baseline{% endblock %}
 
 {% block head %}
-<script src="static/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 {% endblock %}
 
 {% block page_content %}
 
-<div class="container-fluid" id="page-content">
-    <h1>Compare Baseline</h1>
-	<form action="/compare/baseline" method="post" enctype="multipart/form-data" onsubmit="return isFileSelected();">
-		<select name="baseline_id">
-		{% for baseline in baselines %}
-			<option value="{{ baseline.id }}">{{ baseline.name|striptags|title }}</option>
-		{% endfor %}
-		</select>
-		<br><br>
-		<input id="compare_file" name="compare_file" type="file">
-		<br><br>
-		{% for comparison in comparison_types %}
-		{% if loop.index == 1 %}
-			<input id="comparison{{ comparison.id }}" type="radio" name="comparison_type" value="{{ comparison.id }}" checked="checked">
-		{% else %}
-			<input id="comparison{{ comparison.id }}" type="radio" name="comparison_type" value="{{ comparison.id }}">
-		{% endif %}
-			<label for="comparison{{ comparison.id }}">{{ comparison.name|striptags|title }}</label>
-		{% endfor %}
-		<br>
-		<input type="submit" value="Upload">
-	</form>
+<div class="row-fluid">
+	<div class="form-box span8 offset2">
+		<form action="{{ url_for('compare_baseline') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return isFileSelected();">
+			<fieldset>
+				<div class="form-legend">Compare to Baseline</div>
+				<div class="control-group">
+					<label class="control-label">Baseline File</label>
+					<div class="controls">
+						<select name="baseline_id" class="span6">
+						{% for baseline in baselines %}
+							{% if selected_baseline and baseline.id == selected_baseline %}
+							<option value="{{ baseline.id }}" selected="selected">{{ baseline.name|striptags|title }}</option>
+							{% else %}
+							<option value="{{ baseline.id }}">{{ baseline.name|striptags|title }}</option>
+							{% endif %}
+						{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Comparison File</label>
+					<div class="controls">
+						<input type="file" name="compare_file" class="input-block-level" placeholder="Comparison File">
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Compare</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
 </div>
 
 <script src='static/tables_input.js'></script>

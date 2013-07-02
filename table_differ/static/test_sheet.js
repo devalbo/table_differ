@@ -11,30 +11,37 @@ $container.handsontable({
   minSpareRows: 4,
   contextMenu: true,
 });
+
 var handsontable = $container.data('handsontable');
 
-$('#compare').click(function() {
 
+$(document).ready( function() {
+	updateBaselineContents();
+});
+
+$('#baseline-id').change( function() {
+	updateBaselineContents();
+});
+
+function updateBaselineContents() {
+	var baselineData = {
+		baseline_id: $('#baseline-id').val()
+	};
+	
 	$.ajax({
-	  url: "test_sheet_data",
-	  dataType: 'json',
-	  contentType: 'application/json',
-	  type: 'GET',
-	  success: function (res, textStatus) {
-		alert(res.data);
+		url: "data",
+		type: 'POST',
+		dataType: 'json',
+		data: baselineData
+	}).done(function(res, textStatus) {
 		if (res.data) {
             handsontable.loadData(res.data);
-            $console.text('Data loaded');
         }
         else {
             // data.form contains the HTML for the replacement form
             $("#myform").replaceWith(data.form);
         }
-	  },
-	  error: function (data, textStatus) {
-	    alert(JSON.stringify(data));
-		$console.text('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
-	  }
+	}).fail(function() {
+		alert('failure :(');
 	});
-
-});
+}

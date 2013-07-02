@@ -1,0 +1,18 @@
+{% extends "new_base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block head %}
+<script src="static/jquery.min.js"></script>
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row-fluid">
+	<div class="error-box span6 offset3">
+		<h3>Oh, no! Something went wrong.</h3>
+		<span class="error">{{ error_message }}</span>
+	</div>
+</div>
+
+{% endblock %}
