@@ -11,15 +11,11 @@ Windows
 
 * Install Python 2.7 from http://www.python.org
 
-* Get git working (git hub has Github for Windows at http://windows.github.com/)
+* Get git working (github has Github for Windows at http://windows.github.com/)
 
-* Make a fork of the table_differ repository in github, then > git clone the fork.
+* Make a fork of the table_differ repository in github, then **git clone** the fork.
 <https://help.github.com/articles/fork-a-repo> is a good link describing github's recommended process for forking
 a repo.
-
-* Make a fork of
-
-* Git clone the fork
 
 * Get Pip and VirtualEnv running... this will help keep development environment clean and reproducible
 https://zignar.net/2012/06/17/install-python-on-windows/
