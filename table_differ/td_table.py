@@ -1,3 +1,4 @@
+import unicodedata
 class TdTable:
 
     def __init__(self):
@@ -9,7 +10,11 @@ class TdTable:
     def get_value(self, row_index, col_index, as_str=True):
         v = self._rows[row_index][col_index]
         if as_str:
-            v = str(v)
+<<<<<<< HEAD
+            v = unicode(v)
+=======
+            v = unicodedata.normalize('NFKD', unicode(v)).encode('ascii', 'ignore')
+>>>>>>> ef3fe337d89f49305b59c6ab96559571be4f4314
         return v
 
     @property
