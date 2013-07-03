@@ -13,7 +13,11 @@ Windows
 
 * Get git working (git hub has Github for Windows at http://windows.github.com/)
 
-* Make a fork of the table_differ repository in github
+* Make a fork of the table_differ repository in github, then > git clone the fork.
+<https://help.github.com/articles/fork-a-repo> is a good link describing github's recommended process for forking
+a repo.
+
+* Make a fork of
 
 * Git clone the fork
 
