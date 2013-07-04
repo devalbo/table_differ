@@ -18,3 +18,4 @@ class Configuration(object):
         STORAGE_LOCATION = '/tmp/table_differ'
 
     UPLOAD_FOLDER = os.path.join(STORAGE_LOCATION, 'uploads')
+    THUMBNAIL_DIR = os.path.join(STORAGE_LOCATION, 'compare_images')
