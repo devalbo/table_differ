@@ -1,6 +1,6 @@
 
 from flask import Blueprint, render_template, abort, request, url_for, jsonify, Markup, redirect
-import models, td_parsers, td_comparison, td_persist, td_thumbnail, baseline
+import models, td_parsers, td_comparison, td_persist, td_thumbnail, baselines
 
 blueprint = Blueprint('compare', __name__,
                       template_folder='templates')
@@ -75,11 +75,11 @@ def quick_compare():
 
 @blueprint.route('/baseline/')
 def compare_baseline():
-    redirect_url = url_for('baseline.compare_baseline')
+    redirect_url = url_for('baselines.compare_baseline')
     return redirect(redirect_url)
 
 @blueprint.route('/baseline/<int:baseline_id>')
 def compare_baseline_view(baseline_id):
-    redirect_url = url_for('baseline.compare_baseline_view', baseline_id=baseline_id)
+    redirect_url = url_for('baselines.compare_baseline_view', baseline_id=baseline_id)
     return redirect(redirect_url)
 

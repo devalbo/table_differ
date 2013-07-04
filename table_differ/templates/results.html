@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row-fluid">
+	<div class="error-box span6 offset3">
+		<h3>A list of result links</h3>
+		<span class="error">{{ error_message }}</span>
+	</div>
+</div>
+
+{% endblock %}

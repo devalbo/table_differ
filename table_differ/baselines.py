@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, abort, request, url_for, jsonify, redirect
 import models, td_persist, td_parsers
 
-blueprint = Blueprint('baseline', __name__,
+blueprint = Blueprint('baselines', __name__,
                       template_folder='templates')
 
 # Manage a baseline with the specified baseline ID.
@@ -12,7 +12,9 @@ def manage_baseline_view(baseline_id):
     if baselines.count() == 0:
         return display_error('There are no baselines on the server. Please upload a baseline first.')
     return render_template('manage_baselines.html',
-        header_tab_classes={'manage-baseline': 'active'}, baselines=baselines, selected_baseline=baseline_id)
+                           header_tab_classes={'manage-baseline': 'active'},
+                           baselines=baselines,
+                           selected_baseline=baseline_id)
 
 # Manage a baseline
 @blueprint.route('/manage', methods=['GET', 'POST'])
@@ -80,7 +82,9 @@ def compare_baseline_view(baseline_id):
     if baselines.count() == 0:
         return display_error('There are no baselines on the server. Please upload a baseline first.')
     return render_template('compare_baseline.html',
-        header_tab_classes={'compare-baseline': 'active'}, baselines=baselines, selected_baseline=baseline_id)
+                           header_tab_classes={'compare-baseline': 'active'},
+                           baselines=baselines,
+                           selected_baseline=baseline_id)
 
 @blueprint.route('/data', methods=['POST'])
 def get_baseline_grid_data():

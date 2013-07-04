@@ -6,9 +6,13 @@ from app import app
 blueprint = Blueprint('results', __name__,
                       template_folder='templates')
 
+@blueprint.route('/')
+def show_results():
+    return render_template('results.html',
+                           header_tab_classes={'compare-results': 'active'})
 
 @blueprint.route('/<comparison_id>')
-def show_results(comparison_id):
+def show_result(comparison_id):
     options = td_config.RenderTableOptions()
 
     report_notes = []
@@ -111,7 +115,6 @@ def show_new_results_data(comparison_id):
 
         items.append(items_row)
         item_styles.append(item_styles_row)
-
 
     response = {"result": "ok",
                 "data": {"cells": items,
