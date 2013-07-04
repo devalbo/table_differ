@@ -4,7 +4,7 @@ from flask_peewee.admin import Admin, ModelAdmin
 
 from app import app, db
 from auth import auth
-from models import User, UploadedFile, Baseline
+from models import User, UploadedFile, Baseline, ComparisonResult, NewBaseline
 
 admin = Admin(app, auth)
 auth.register_admin(admin)
@@ -12,3 +12,5 @@ auth.register_admin(admin)
 # any other models here.
 admin.register(UploadedFile)
 admin.register(Baseline)
+admin.register(ComparisonResult)
+admin.register(NewBaseline)

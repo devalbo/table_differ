@@ -30,6 +30,9 @@ app.register_blueprint(compare.blueprint, url_prefix='/compare')
 app.register_blueprint(baselines.blueprint, url_prefix='/baselines')
 app.register_blueprint(results.blueprint, url_prefix='/results')
 
+@app.route('/')
+def index():
+    return redirect(url_for('compare.copy_paste_compare'))
 
 # ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
@@ -337,8 +340,8 @@ app.register_blueprint(results.blueprint, url_prefix='/results')
 #     return send_from_directory(td_thumbnail.THUMBNAIL_DIR,
 #                                "%s.png" % comparison_id)
 
-def display_error(error_message):
-    return render_template('error.html', header_tab_classes=None, error_message=error_message)
+# def display_error(error_message):
+#     return render_template('error.html', header_tab_classes=None, error_message=error_message)
 
 admin.setup()
 api.setup()

@@ -24,7 +24,7 @@ def manage_baselines():
 
     # If there are files in the request, store them.
     if request.method == 'POST':
-        baseline_file = save_excel_file(request.files['baseline_file'], 'baselines')
+        baseline_file = td_persist.save_excel_file(request.files['baseline_file'], 'baselines')
         baseline_record = models.Baseline.create(
             name=request.form['baseline_name'],
             file=baseline_file.id,
@@ -70,7 +70,7 @@ def compare_baseline():
     # Note: Could we join here using the ORM instead?
     comparison_record = models.ComparisonType.get(models.ComparisonType.id == baseline.comparison)
     comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
-    comparison_id = td_persist.store_new_comparison(comparison)
+    comparison_id = td_persist.store_comparison(comparison)
     td_thumbnail.create_comparison_image(comparison, comparison_id)
 
     redirect_url = url_for('show_results', comparison_id=comparison_id)
@@ -97,3 +97,8 @@ def get_baseline_grid_data():
     response = {"result": "ok",
                 "data": data}
     return jsonify(response)
+
+def display_error(error_message):
+    return render_template('error.html',
+                           header_tab_classes=None,
+                           error_message=error_message)

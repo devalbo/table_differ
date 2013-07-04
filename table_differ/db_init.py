@@ -13,9 +13,11 @@ admin.save()
 
 models.UploadedFile.create_table()
 models.Baseline.create_table()
+models.NewBaseline.create_table()
+models.ComparisonResult.create_table()
 
 # Create the comparison settings table.
 models.ComparisonType.create_table()
 
-models.ComparisonType.create(name='Literal')
-models.ComparisonType.create(name='Regular Expression')
+models.ComparisonType.create(name=models.ComparisonType.COMPARISON_TYPE_LITERAL)
+models.ComparisonType.create(name=models.ComparisonType.COMPARISON_TYPE_REGEX)

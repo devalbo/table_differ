@@ -1,11 +1,11 @@
 
+import datetime
 from flask import Blueprint, render_template, abort, request, url_for, jsonify, Markup, redirect
 import models, td_parsers, td_comparison, td_persist, td_thumbnail, baselines
 
 blueprint = Blueprint('compare', __name__,
                       template_folder='templates')
 
-@blueprint.route('/')
 @blueprint.route('/copy-paste', methods=['GET', 'POST'])
 def copy_paste_compare():
     if request.method == 'GET':
@@ -14,12 +14,31 @@ def copy_paste_compare():
 
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
+    comparison_id = _do_comparison(table1, table2, td_comparison.COMPARE_LITERAL)
 
-    comparison = td_comparison.compare_tables(table1, table2, td_comparison.COMPARE_LITERAL)
-    comparison_id = td_persist.store_new_comparison(comparison)
-    td_thumbnail.create_comparison_image(comparison, comparison_id)
+    # comparison = td_comparison.compare_tables(table1, table2, td_comparison.COMPARE_LITERAL)
+    # comparison_id = td_persist.store_comparison(comparison)
+    # table1_id = td_persist.store_td_table(table1)
+    # table2_id = td_persist.store_td_table(table2)
+    # td_thumbnail.create_comparison_image(comparison, comparison_id)
+    # literal_compare = models.ComparisonType.get(models.ComparisonType.name==models.ComparisonType.COMPARISON_TYPE_LITERAL)
+    #
+    # baseline_record = models.NewBaseline.create(
+    #     name=table1_id,
+    #     baseline_table_id=table1_id,
+    #     comparison_type=literal_compare,
+    #     )
+    # comparison_record = models.ComparisonResult.create(
+    #     expected_table_id=table1_id,
+    #     actual_table_id=table2_id,
+    #     comparison_results_id=comparison_id,
+    #     comparison_type=literal_compare,
+    #     baseline=baseline_record,
+    #     timestamp=datetime.datetime.now(),
+    #     )
 
-    redirect_url = url_for('results.show_results', comparison_id=comparison_id)
+    redirect_url = url_for('results.show_result',
+                           comparison_id=comparison_id)
     return jsonify(redirect_url=redirect_url)
 
 @blueprint.route('/xls-worksheet', methods=['GET', 'POST'])
@@ -40,14 +59,16 @@ def xls_worksheet_compare():
         expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
         actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
 
-        comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
-        comparison_id = td_persist.store_new_comparison(comparison)
-        td_thumbnail.create_comparison_image(comparison, comparison_id)
+        comparison_id = _do_comparison(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
+        # comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
+        # comparison_id = td_persist.store_comparison(comparison)
+        # td_thumbnail.create_comparison_image(comparison, comparison_id)
 
-        redirect_url = url_for('results.show_results', comparison_id=comparison_id)
+        redirect_url = url_for('results.show_result',
+                               comparison_id=comparison_id)
         return redirect(redirect_url)
 
-    return redirect(url_for('xls_worksheet_compare'))
+    return redirect(url_for('compare.xls_worksheet_compare'))
 
 # Perform a quick comparison between two Excel files.
 @blueprint.route('/quick', methods=['GET', 'POST'])
@@ -57,20 +78,23 @@ def quick_compare():
         return render_template('quick_compare.html',
             header_tab_classes={'quick-compare': 'active'}, comparison_types=comparison_types)
 
-    baseline_file = save_excel_file(request.files['baseline_file'], 'actual')
-    actual_file = save_excel_file(request.files['comparison_file'], 'actual')
+    baseline_file = td_persist.save_excel_file(request.files['baseline_file'], 'actual')
+    actual_file = td_persist.save_excel_file(request.files['comparison_file'], 'actual')
 
-    expected_results_table = td_parsers.load_table_from_xls(get_excel_file_path(baseline_file.id))
-    actual_results_table = td_parsers.load_table_from_xls(get_excel_file_path(actual_file.id))
+    expected_results_table = td_parsers.load_table_from_xls(td_persist.get_excel_file_path(baseline_file.id))
+    actual_results_table = td_parsers.load_table_from_xls(td_persist.get_excel_file_path(actual_file.id))
 
     comparison_record = models.ComparisonType.get(models.ComparisonType.id == request.form['comparison_type'])
-    comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
-    comparison_id = td_persist.store_new_comparison(comparison)
-    td_thumbnail.create_comparison_image(comparison, comparison_id)
+    # comparison = td_comparison.compare_tables(expected_results_table, actual_results_table, comparison_record.name)
+    # comparison_id = td_persist.store_comparison(comparison)
+    # td_thumbnail.create_comparison_image(comparison, comparison_id)
+    comparison_id = _do_comparison(expected_results_table, actual_results_table, comparison_record.name)
+
 
     # Note: We could delete the files once we're done with a quick comparison.
 
-    redirect_url = url_for('results.show_results', comparison_id=comparison_id)
+    redirect_url = url_for('results.show_result',
+                           comparison_id=comparison_id)
     return redirect(redirect_url)
 
 @blueprint.route('/baseline/')
@@ -83,3 +107,26 @@ def compare_baseline_view(baseline_id):
     redirect_url = url_for('baselines.compare_baseline_view', baseline_id=baseline_id)
     return redirect(redirect_url)
 
+def _do_comparison(table1, table2, comparison_type):
+    comparison = td_comparison.compare_tables(table1, table2, comparison_type)
+    comparison_id = td_persist.store_comparison(comparison)
+    table1_id = td_persist.store_td_table(table1)
+    table2_id = td_persist.store_td_table(table2)
+    td_thumbnail.create_comparison_image(comparison, comparison_id)
+    literal_compare = models.ComparisonType.get(models.ComparisonType.name==models.ComparisonType.COMPARISON_TYPE_LITERAL)
+
+    baseline_record = models.NewBaseline.create(
+        name=table1_id,
+        baseline_table_id=table1_id,
+        comparison_type=literal_compare,
+        )
+    comparison_record = models.ComparisonResult.create(
+        expected_table_id=table1_id,
+        actual_table_id=table2_id,
+        comparison_results_id=comparison_id,
+        comparison_type=literal_compare,
+        baseline=baseline_record,
+        timestamp=datetime.datetime.now(),
+        )
+
+    return comparison_id

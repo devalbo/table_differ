@@ -2,14 +2,17 @@
 from flask import Blueprint, render_template, abort, request, url_for, Markup, send_from_directory, jsonify
 import td_config, td_persist
 from app import app
+import models
 
 blueprint = Blueprint('results', __name__,
                       template_folder='templates')
 
 @blueprint.route('/')
 def show_results():
+    results = models.ComparisonResult.select()
     return render_template('results.html',
-                           header_tab_classes={'compare-results': 'active'})
+                           header_tab_classes={'compare-results': 'active'},
+                           results=results)
 
 @blueprint.route('/<comparison_id>')
 def show_result(comparison_id):
@@ -17,7 +20,7 @@ def show_result(comparison_id):
 
     report_notes = []
 
-    comparison = td_persist.retrieve_new_comparison(comparison_id)
+    comparison = td_persist.retrieve_comparison(comparison_id)
     expected_row_count = comparison.expected_table.row_count
     actual_row_count = comparison.actual_table.row_count
     if expected_row_count != actual_row_count:
@@ -79,7 +82,7 @@ def show_result(comparison_id):
                            table_rows=table_rows,
                            report_notes=report_notes,
                            options=options,
-                           header_tab_classes={},
+                           header_tab_classes={'compare-results': 'active'},
                            comparison_id=comparison_id)
 
 @blueprint.route('/data/<comparison_id>')

@@ -26,7 +26,31 @@ class UploadedFile(db.Model):
 class ComparisonType(db.Model):
     name = CharField()
 
+    COMPARISON_TYPE_LITERAL = 'Literal'
+    COMPARISON_TYPE_REGEX = 'Regular Expression'
+
+    def __unicode__(self):
+        return self.name
+
+
+
 class Baseline(db.Model):
     name = CharField()
     file = ForeignKeyField(UploadedFile)
     comparison = ForeignKeyField(ComparisonType)
+
+class NewBaseline(db.Model):
+    name = CharField()
+    baseline_table_id = CharField()
+    comparison_type = ForeignKeyField(ComparisonType)
+
+class ComparisonResult(db.Model):
+    expected_table_id = CharField()
+    actual_table_id = CharField()
+    comparison_results_id = CharField()
+    comparison_type = ForeignKeyField(ComparisonType)
+    baseline = ForeignKeyField(NewBaseline)
+    timestamp = DateTimeField()
+
+    def __unicode__(self):
+        return "%s comparison - performed at %s" % (self.comparison_type.name, self.timestamp)
