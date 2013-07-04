@@ -99,7 +99,7 @@ $('#compare').click(function() {
 	}
 	
 	$.ajax({
-	  url: "copy-paste-compare",
+	  url: "copy-paste",
 	  data: JSON.stringify(tableData), //returns all cells' data
 	  dataType: 'json',
 	  contentType: 'application/json',

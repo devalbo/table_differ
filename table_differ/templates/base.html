@@ -24,24 +24,30 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="{{ url_for('copy_paste_compare') }}">Table Differ</a>
+            <a class="brand" href="{{ url_for('compare.copy_paste_compare') }}">Table Differ</a>
             <div class="nav-collapse">
                 <ul class="nav nav-tabs">
-                    <li class="{{ header_tab_classes['copy-paste-compare'] }}"><a href="{{ url_for('copy_paste_compare') }}">Copy/Paste Comparison</a></li>
-					<li class="{{ header_tab_classes['quick-compare'] }}"><a href="{{ url_for('quick_compare') }}">Quick Compare</a></li>
-{#                  <li class="{{ header_tab_classes['file-compare'] }}"><a href="{{ url_for('file_compare') }}">File Comparison</a></li>#}
-                    <li class="{{ header_tab_classes['xls-worksheet-compare'] }}"><a href="{{ url_for('xls_worksheet_compare') }}">QC Ref/Act Comparison</a></li>
-{#                  <li class="{{ header_tab_classes['table-compare'] }}"><a href="/compare">Full Comparison</a></li>#}
-{#                  <li class="{{ header_tab_classes['manage-tables'] }}"><a href="/manage-tables">Manage Tables</a></li>#}
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Baselines<b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li class="{{ header_tab_classes['compare-baseline'] }}"><a href="{{ url_for('compare_baseline') }}">Compare to Baseline</a></li>
-							<li class="divider"></li>
-							<li class="{{ header_tab_classes['upload-baseline'] }}"><a href="{{ url_for('upload_baseline') }}">Upload Baseline</a></li>
-							<li class="{{ header_tab_classes['manage-baseline'] }}"><a href="{{ url_for('manage_baselines') }}">Manage Baselines</a></li>
-						</ul>
-					</li>
+                  <li class="{{ header_tab_classes['compare-baseline'] }}"><a href="{{ url_for('compare.copy_paste_compare') }}">Copy/Paste Compare</a></li>
+                  <li class="{{ header_tab_classes['upload-baseline'] }}"><a href="{{ url_for('compare.quick_compare') }}">Quick Compare</a></li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Comparisons<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+{#                      <li class="{{ header_tab_classes['compare-baseline'] }}"><a href="{{ url_for('copy_paste_compare') }}">Copy/Paste Compare</a></li>#}
+{#                      <li class="{{ header_tab_classes['upload-baseline'] }}"><a href="{{ url_for('quick_compare') }}">Quick Compare</a></li>#}
+                      <li class="{{ header_tab_classes['manage-baseline'] }}"><a href="{{ url_for('compare.compare_baseline') }}">Baseline Compare</a></li>
+                      <li class="{{ header_tab_classes['xls-worksheet-compare'] }}"><a href="{{ url_for('compare.xls_worksheet_compare') }}">QC Ref/Act Compare</a></li>
+                    </ul>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Baselines<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li class="{{ header_tab_classes['compare-baseline'] }}"><a href="{{ url_for('baseline.compare_baseline') }}">Compare to Baseline</a></li>
+                      <li class="divider"></li>
+                      <li class="{{ header_tab_classes['upload-baseline'] }}"><a href="{{ url_for('baseline.upload_baseline') }}">New Baseline</a></li>
+                      <li class="{{ header_tab_classes['manage-baseline'] }}"><a href="{{ url_for('baseline.manage_baselines') }}">Manage Baselines</a></li>
+                    </ul>
+                  </li>
+                  <li class="{{ header_tab_classes['xls-worksheet-compare'] }}"><a href="{{ url_for('compare.xls_worksheet_compare') }}">Results</a></li>
                 </ul>
             </div>
         </div>
@@ -53,7 +59,7 @@
 
 {% endblock %}
 
-<div id="page-footer">2013 Chatham Financial Corp.
+<div id="page-footer">Table Differ
 </div>
 </body>
 </html> 
