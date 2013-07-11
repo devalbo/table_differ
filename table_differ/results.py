@@ -80,12 +80,15 @@ def show_result(comparison_id):
 
         table_rows.append(table_row)
 
+    baseline_id = cr.baseline.id
+
     return render_template('comparison_results.html',
                            table_rows=table_rows,
                            report_notes=report_notes,
                            options=options,
                            header_tab_classes={'compare-results': 'active'},
-                           comparison_id=comparison_id)
+                           comparison_id=comparison_id,
+                           baseline_id=baseline_id)
 
 @blueprint.route('/data/<comparison_id>')
 def show_new_results_data(comparison_id):

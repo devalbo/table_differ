@@ -68,6 +68,10 @@
 					<div class="controls">
             <div id="results-grid" class="handsontable"></div>
 					</div>
+          <div class="control-group">
+{#            <label class="control-label">Edit baseline table</label>#}
+            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
+          </div>
         </div>
       </div>
     </div>

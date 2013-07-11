@@ -19,7 +19,7 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
-      <th>Type</th>
+      <th>Comparison</th>
       <th>Last Modified</th>
       <th>Who</th>
     </tr>
@@ -28,7 +28,7 @@
       {% for baseline in baselines %}
         <tr>
           <td>{{ baseline.id }}</td>
-          <td><a href="{{ url_for('baselines.view_baseline', baseline_id=baseline.id) }}">{{ baseline }}</a></td>
+          <td><a href="{{ url_for('baselines.view_baseline', baseline_id=baseline.id) }}">{{ baseline.name }}</a></td>
           <td>{{ baseline.comparison_operation.name }}</td>
           <td>{{ baseline.last_modified}}</td>
           <td></td>

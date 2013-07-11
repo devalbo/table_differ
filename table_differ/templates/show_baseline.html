@@ -40,7 +40,7 @@
           <form action="{{ url_for('baselines.update_baseline', baseline_id=baseline.id) }}" method="post" class="form-horizontal" onsubmit="return false;">
             <fieldset>
               <div class="control-group">
-                <label class="control-label">Baseline Name</label>
+                <label class="control-label">Name</label>
                 <div class="controls">
                   <input type="text" class="input-block-level span6" id="baseline_name" name="baseline_name" value="{{ baseline.name }}">
                 </div>
@@ -53,7 +53,7 @@
                 </div>
               </div>
               <div class="control-group">
-                <label class="control-label">Comparison Type</label>
+                <label class="control-label">Comparison</label>
                 <div class="controls" id="comparisonTypes">
                   {% for comparison in comparison_operations %}
                   <label class="radio-label">

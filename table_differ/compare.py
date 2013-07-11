@@ -19,7 +19,8 @@ def copy_paste_compare():
 
     table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
     table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
-    comparison_id = td_comparison.do_adhoc_comparison(table1, table2, td_comparison.COMPARE_LITERAL)
+    comparison_id = td_comparison.do_adhoc_comparison(table1, table2, td_comparison.COMPARE_LITERAL,
+                                                      "Quick compare at %s" % datetime.datetime.now())
 
     redirect_url = url_for('results.show_result',
                            comparison_id=comparison_id)

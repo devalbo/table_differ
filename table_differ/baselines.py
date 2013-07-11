@@ -74,7 +74,7 @@ def upload_baseline():
         comparison_operation = int(request.form['comparison_type'])
         baseline_name = request.form['baseline_name'].strip()
         if len(baseline_name) < 1:
-            baseline_name = "Uploaded at %s" % now
+            baseline_name = "File upload at %s" % now
 
         comparison_operation = models.ComparisonOperation.create(
             type=comparison_operation,

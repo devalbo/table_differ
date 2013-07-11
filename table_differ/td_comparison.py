@@ -182,7 +182,9 @@ def do_baseline_comparison(actual_results_table,
     return comparison_result.id
 
 
-def do_adhoc_comparison(table1, table2, comparator, baseline_description="Ad hoc comparison"):
+def do_adhoc_comparison(table1, table2, comparator,
+                        baseline_name="New baseline",
+                        baseline_description="Ad hoc comparison"):
 
     now = datetime.datetime.now()
 
@@ -201,7 +203,7 @@ def do_adhoc_comparison(table1, table2, comparator, baseline_description="Ad hoc
         description=baseline_description,
         )
     baseline = models.Baseline.create(
-        name="%s" % now,
+        name=baseline_name,
         pickled_expected_table=pickle.dumps(table2),
         comparison_operation=literal_compare,
         last_modified=now,
