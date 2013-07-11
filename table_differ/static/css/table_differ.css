@@ -1,8 +1,9 @@
-.mismatch { background-color:red; color:white; }
-.ok { background-color:#33FF99; color:black; }
+.mismatch { background-color:red; color: white; }
+.ok { background-color:#33FF99; color: black; }
 .missing_expected { background-color: red; color: white; }
 .missing_actual { background-color: red; color: white; }
 .padding { background-color: white; color: white; }
+.unexpected { background-color: yellow; }
 
 div#page-content {
 	background-color: #fdfdfd;
@@ -100,3 +101,14 @@ table.table thead .sorting_desc_disabled { background: url('/static/img/sort_des
 	*cursor: hand;
 	color: #333 !important;
 }
+
+td.mismatch { background-color: red; color: white; }
+td.ok { background-color:#33FF99; color: black; }
+td.missing_expected { background-color: red; color: white; }
+td.missing_actual { background-color: red; color: white; }
+td.padding { background-color: white; color: white; }
+td.unexpected { background-color: yellow; }
+
+/*td.mismatch {*/
+    /*background: pink;*/
+/*}*/

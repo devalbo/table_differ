@@ -18,7 +18,7 @@ $container.handsontable({
   minSpareRows: 6,
   contextMenu: true,
   cells: function (row, col, prop) {
-//    this.renderer = errorRenderer; //uses function directly
+//    this.renderer = cellRenderer; //uses function directly
   },
 });
 
