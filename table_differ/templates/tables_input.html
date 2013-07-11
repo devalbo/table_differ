@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Compare Tables{% endblock %}
+{% block title %}Copy/Paste Compare{% endblock %}
 
 {% block head %}
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
@@ -11,7 +11,7 @@
 {% block page_content %}
 
 <div class="row-fluid">
-	<div class="form-box span8 offset2">
+	<div class="form-box span10 offset1">
 		<form action="{{ url_for('compare.compare_baseline') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return false;">
 			<fieldset>
 				<div class="form-legend">Compare Tables</div>

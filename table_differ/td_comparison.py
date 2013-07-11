@@ -1,4 +1,6 @@
-import re
+import re, pickle, datetime
+import models
+import td_thumbnail
 
 COMPARE_LITERAL = "Literal"
 COMPARE_RE_SKIP = "Regular Expression"
@@ -8,7 +10,6 @@ def compare_tables(t1, t2, comparator):
     comparison = TdComparison(t1, t2)
     comparison.do_comparison(comparator)
     return comparison
-
 
 class TdComparison:
 
@@ -152,3 +153,60 @@ class TdComparison:
         self._actual_table_only_cells = actual_table_only_cells
         self._neither_table_cell_coords = neither_table_cell_coords
 
+
+def do_baseline_comparison(actual_results_table,
+                           baseline_id,
+                           timestamp=datetime.datetime.now(),
+                           description="Baseline comparison"):
+
+    baseline = models.Baseline.get(models.Baseline.id == baseline_id)
+    expected_results_table = pickle.loads(baseline.pickled_expected_table)
+    comparison_type = baseline.comparison_operation.name
+
+    comparison = compare_tables(actual_results_table,
+                                expected_results_table,
+                                comparison_type)
+    try:
+        thumbnail_img = td_thumbnail.create_comparison_image(comparison)
+    except NameError, e:
+        thumbnail_img = ""
+
+    comparison_result = models.ComparisonResult.create(
+        pickled_actual_table=pickle.dumps(actual_results_table),
+        baseline=baseline,
+        comparison_image=thumbnail_img,
+        pickled_comparison_report=pickle.dumps(comparison),
+        timestamp=timestamp,
+        )
+
+    return comparison_result.id
+
+
+def do_adhoc_comparison(table1, table2, comparator, baseline_description="Ad hoc comparison"):
+
+    now = datetime.datetime.now()
+
+    if comparator == COMPARE_LITERAL:
+        comparison_type = 0
+    elif comparator == COMPARE_RE_SKIP:
+        comparison_type = 1
+    else:
+        raise Exception("No such comparator: %s" % comparator)
+
+    literal_compare = models.ComparisonOperation.create(
+        type=comparison_type,
+    )
+    baseline_source = models.BaselineSource.create(
+        adhoc=True,
+        description=baseline_description,
+        )
+    baseline = models.Baseline.create(
+        name="%s" % now,
+        pickled_expected_table=pickle.dumps(table2),
+        comparison_operation=literal_compare,
+        last_modified=now,
+        created=now,
+        source=baseline_source,
+        )
+
+    return do_baseline_comparison(table1, baseline.id)

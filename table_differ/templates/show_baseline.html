@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Table Differ{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.handsontable.full.js') }}"></script>
+<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='css/jquery.handsontable.full.css') }}">
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row-fluid">
+	<div class="form-box span10 offset1">
+    <div class="form-legend">Baseline - {{ baseline.name }}</div>
+    <div class="bs-docs-example">
+      <ul id="myTab" class="nav nav-pills">
+        <li class="active"><a href="#doUpdate" data-toggle="tab">Update</a></li>
+        <li><a href="#doCompare" data-toggle="tab">Do Comparison</a></li>
+      </ul>
+
+      <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade" id="doCompare">
+          <form action="{{ url_for('baselines.compare_baseline', baseline_id=baseline.id) }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return isFileSelected();">
+          <fieldset>
+            <div class="control-group">
+              <label class="control-label">Comparison File</label>
+              <div class="controls">
+                <input type="file" name="compare_file" class="input-block-level" placeholder="Comparison File">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Compare</button>
+            </div>
+          </fieldset>
+        </form>
+
+        </div>
+        <div class="tab-pane fade in active" id="doUpdate">
+          <form action="{{ url_for('baselines.update_baseline', baseline_id=baseline.id) }}" method="post" class="form-horizontal" onsubmit="return false;">
+            <fieldset>
+              <div class="control-group">
+                <label class="control-label">Baseline Name</label>
+                <div class="controls">
+                  <input type="text" class="input-block-level span6" id="baseline_name" name="baseline_name" value="{{ baseline.name }}">
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Table</label>
+                <div class="controls">
+                  <div id="dataTable" class="handsontable"></div>
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">Comparison Type</label>
+                <div class="controls" id="comparisonTypes">
+                  {% for comparison in comparison_operations %}
+                  <label class="radio-label">
+                    {% if baseline.comparison_operation.type == comparison %}
+                      <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}" checked="checked">
+                    {% else %}
+                      <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}">
+                    {% endif %}
+                    {{ comparison_operations[comparison]|striptags|title }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="form-actions">
+                <button id="update" class="btn btn-primary">Update</button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+	</div>
+</div>
+
+<script>
+    var baseline_id = {{ baseline.id }};
+</script>
+<script src="{{ url_for('static', filename='js/test_sheet.js') }}"></script>
+
+{% endblock %}

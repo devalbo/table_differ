@@ -1,89 +1,79 @@
 {% extends "base.html" %}
 
-{% block title %}Data Comparison Results{% endblock %}
+{% block title %}Table Comparison Results{% endblock %}
 
 {% block head %}
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-{#<script src="{{ url_for('static', filename='jquery.handsontable.full.js') }}"></script>#}
-{#<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='jquery.handsontable.full.css') }}">#}
-{#<script src="http://handsontable.com/lib/jquery-ui/js/jquery-ui.custom.min.js"></script>#}
-
-{#<script src="http://handsontable.com/lib/jquery.min.js"></script>#}
-{#<script src="http://handsontable.com/dist/jquery.handsontable.full.js"></script>#}
-{#<link rel="stylesheet" media="screen" href="http://handsontable.com/dist/jquery.handsontable.full.css">#}
-{#<script src="http://handsontable.com/lib/jquery-ui/js/jquery-ui.custom.min.js"></script>#}
-{#<link rel="stylesheet" media="screen" href="http://handsontable.com/lib/jquery-ui/css/ui-bootstrap/jquery-ui.custom.css">#}
-{#<link rel="stylesheet" media="screen" href="http://handsontable.com/demo/css/samples.css">#}
-
+<script src="{{ url_for('static', filename='js/jquery.handsontable.full.js') }}"></script>
+<link rel="stylesheet" media="screen" href="{{ url_for('static', filename='css/jquery.handsontable.full.css') }}">
+<script src="http://handsontable.com/lib/jquery-ui/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript">
-//<![CDATA[
-var comparison_id = "{{ comparison_id }}";
-//]]>
+  var comparison_id = "{{ comparison_id }}";
 </script>
 {% endblock %}
 
 {% block page_content %}
 <div class="container-fluid" id="page-content">
+	<div class="form-box span10 offset1">
+    <div class="form-legend">Comparison Results</div>
 
-    <h2>Comparison Results</h2>
     <div class="bs-docs-example">
-        <ul id="myTab" class="nav nav-pills">
-          <li class="active"><a href="#summary" data-toggle="tab">Summary</a></li>
-          <li><a href="#thumbnail" data-toggle="tab">Overview</a></li>
-          <li><a href="#results" data-toggle="tab">Grid</a></li>
-{#          <li><a href="#expected" data-toggle="tab">Baseline</a></li>#}
-{#          <li><a href="#actual" data-toggle="tab">Actual Table</a></li>#}
-        </ul>
+      <ul id="myTab" class="nav nav-pills">
+        <li><a href="#summary" data-toggle="tab">Summary</a></li>
+        <li><a href="#thumbnail" data-toggle="tab">Overview</a></li>
+        <li><a href="#results" data-toggle="tab">Table</a></li>
+        <li class="active"><a href="#results-grid" data-toggle="tab">Grid</a></li>
+      </ul>
 
-        <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade in active" id="summary">
-                <ul>
-                    {% for report_note in report_notes %}
-                      <li>{{ report_note }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="tab-pane fade" id="results">
-{#                  <div id="gridsummary" class="handsontable"></div>#}
-{#                  <button id="compare">Load</button>#}
-                <table border="1">
-
-                    {% if options.show_row_col_labels %}
-                    <tr>
-                        <td/>
-                        {% for cell in table_rows[0] %}
-                        <td>{{ loop.index }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endif %}
-
-                    {% for row in table_rows %}
-                    <tr>
-                        {% if options.show_row_col_labels %}
-                        <td>{{ loop.index }}</td>
-                        {% endif %}
-
-                        {% for cell in row %}
-                        <td class="{{ cell[1] }}">
-                            {{ cell[0] }}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <div class="tab-pane fade" id="thumbnail">
-                <ul>
-                  <img src="{{ url_for('results.thumbnails', comparison_id=comparison_id) }}"/>
-                </ul>
-            </div>
+      <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade" id="summary">
+          <ul>
+              {% for report_note in report_notes %}
+                <li>{{ report_note }}</li>
+              {% endfor %}
+          </ul>
         </div>
-    </div>
+        <div class="tab-pane fade" id="results">
+          <table border="1">
+            {% if options.show_row_col_labels %}
+              <tr>
+                  <td/>
+                  {% for cell in table_rows[0] %}
+                  <td>{{ loop.index }}</td>
+                  {% endfor %}
+              </tr>
+            {% endif %}
 
+            {% for row in table_rows %}
+              <tr>
+                {% if options.show_row_col_labels %}
+                  <td>{{ loop.index }}</td>
+                {% endif %}
+
+                {% for cell in row %}
+                  <td class="{{ cell[1] }}">
+                    {{ cell[0] }}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="tab-pane fade" id="thumbnail">
+          <ul>
+            <img src="{{ url_for('results.thumbnails', comparison_id=comparison_id) }}"/>
+          </ul>
+        </div>
+        <div class="tab-pane fade in active" id="results-grid">
+					<div class="controls">
+            <div id="results-grid" class="handsontable"></div>
+					</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-{#<script src="{{ url_for('static', filename='grid_summary.js') }}"></script>#}
-
-
+<script src="{{ url_for('static', filename='js/comparison_results.js') }}"></script>
 {% endblock %}
 

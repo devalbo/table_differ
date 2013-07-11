@@ -9,7 +9,7 @@
 {% block page_content %}
 
 <div class="row-fluid">
-	<div class="form-box span8 offset2">
+	<div class="form-box span10 offset1">
 		<form action="{{ url_for('baselines.upload_baseline') }}" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return isFileSelected();">
 			<fieldset>
 				<div class="form-legend">Upload Baseline</div>
@@ -28,14 +28,14 @@
 				<div class="control-group">
 					<label class="control-label">Comparison Type</label>
 					<div class="controls">
-						{% for comparison in comparison_types %}
+						{% for comparison in comparison_operations %}
 						<label class="radio-label">
 							{% if loop.index == 1 %}
-								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison.id }}" checked="checked">
+								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}" checked="checked">
 							{% else %}
-								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison.id }}">
+								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}">
 							{% endif %}
-							{{ comparison.name|striptags|title }}
+							{{ comparison_operations[comparison]|striptags|title }}
 						</label>
 						{% endfor %}
 					</div>

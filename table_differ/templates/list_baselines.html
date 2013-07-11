@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Results Summary{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/demo_table.css') }}">
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row-fluid">
+	<div class="form-box span10 offset1">
+  <div class="form-legend">Baselines</div>
+
+  <table id="resultsTable" class="table table-bordered table-striped" cellpadding="0" cellspacing="0" border="0">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Last Modified</th>
+      <th>Who</th>
+    </tr>
+    </thead>
+    <tbody>
+      {% for baseline in baselines %}
+        <tr>
+          <td>{{ baseline.id }}</td>
+          <td><a href="{{ url_for('baselines.view_baseline', baseline_id=baseline.id) }}">{{ baseline }}</a></td>
+          <td>{{ baseline.comparison_operation.name }}</td>
+          <td>{{ baseline.last_modified}}</td>
+          <td></td>
+        </tr>
+      {% endfor %}
+
+  </table>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+
+{% endblock %}

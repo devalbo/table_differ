@@ -1,5 +1,6 @@
 
-from flask import Blueprint, render_template, abort, request, url_for, Markup, send_from_directory, jsonify
+import pickle, StringIO
+from flask import Blueprint, render_template, abort, request, url_for, Markup, send_file, jsonify
 import td_config, td_persist
 from app import app
 import models
@@ -10,7 +11,7 @@ blueprint = Blueprint('results', __name__,
 @blueprint.route('/')
 def show_results():
     results = models.ComparisonResult.select()
-    return render_template('results.html',
+    return render_template('list_results.html',
                            header_tab_classes={'compare-results': 'active'},
                            results=results)
 
@@ -20,7 +21,8 @@ def show_result(comparison_id):
 
     report_notes = []
 
-    comparison = td_persist.retrieve_comparison(comparison_id)
+    cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
+    comparison = pickle.loads(cr.pickled_comparison_report)
     expected_row_count = comparison.expected_table.row_count
     actual_row_count = comparison.actual_table.row_count
     if expected_row_count != actual_row_count:
@@ -87,7 +89,8 @@ def show_result(comparison_id):
 
 @blueprint.route('/data/<comparison_id>')
 def show_new_results_data(comparison_id):
-    comparison = td_persist.retrieve_results(comparison_id)
+    cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
+    comparison = pickle.loads(cr.pickled_comparison_report)
 
     items = []
     item_styles = []
@@ -99,15 +102,15 @@ def show_new_results_data(comparison_id):
                 items_row.append(comparison.same_cells[(row_index, col_index)])
                 item_styles_row.append("ok")
             elif (row_index, col_index) in comparison.diff_cells:
-                items_row.append(Markup("Expected: %s<br>Actual: %s" %
+                items_row.append(Markup("Expected: %s\nActual: %s" %
                                comparison.diff_cells[(row_index, col_index)]))
                 item_styles_row.append("mismatch")
             elif (row_index, col_index) in comparison.expected_table_only_cells:
-                items_row.append(Markup("Expected: %s<br>Actual: --missing--" %
+                items_row.append(Markup("Expected: %s\nActual: --missing--" %
                                comparison.expected_table_only_cells[(row_index, col_index)]))
                 item_styles_row.append("missing_expected")
             elif (row_index, col_index) in comparison.actual_table_only_cells:
-                items_row.append(Markup("Expected: --missing--<br>Actual: %s" %
+                items_row.append(Markup("Expected: --missing--\nActual: %s" %
                                comparison.actual_table_only_cells[(row_index, col_index)]))
                 item_styles_row.append("missing_actual")
             elif (row_index, col_index) in comparison.neither_table_cell_coords:
@@ -128,5 +131,11 @@ def show_new_results_data(comparison_id):
 
 @blueprint.route('/thumbnails/<comparison_id>')
 def thumbnails(comparison_id):
-    return send_from_directory(app.config['THUMBNAIL_DIR'],
-                               "%s.png" % comparison_id)
+    img = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id).comparison_image
+
+    strIO = StringIO.StringIO()
+    strIO.write(img)
+    strIO.seek(0)
+    return send_file(strIO,
+                     attachment_filename="comparison-overview-%s.png" % comparison_id,
+                     as_attachment=True)

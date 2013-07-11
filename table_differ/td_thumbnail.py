@@ -1,14 +1,17 @@
 __author__ = 'ajb'
 
-import os
+import os, StringIO
+
 from PIL import Image, ImageDraw
+# try:
+#     from PIL import Image, ImageDraw
+# except ImportError, e:
+#     print "PIL module isn't available - thumbnail/image results won't be supported"
+
 from app import app
 
-THUMBNAIL_DIR = os.path.join(app.config['STORAGE_LOCATION'],
-                             "compare_images")
 
-
-def create_comparison_image(comparison, comparison_id):
+def create_comparison_image(comparison):
 
     im = Image.new("RGB", (comparison.max_cols, comparison.max_rows), "orange")
     draw = ImageDraw.Draw(im)
@@ -48,10 +51,17 @@ def create_comparison_image(comparison, comparison_id):
 
     del draw
 
-    width = 600
-    height = (width / comparison.max_cols) * comparison.max_rows
+    if comparison.max_cols > comparison.max_rows:
+        width = 600
+        height = (width / comparison.max_cols) * comparison.max_rows
+    else:
+        height = 550
+        width = (height / comparison.max_rows) * comparison.max_cols
     im = im.resize((width, height))
 
-    save_location = os.path.join(THUMBNAIL_DIR,
-                                 "%s.png" % comparison_id)
-    im.save(save_location, "PNG")
+    output = StringIO.StringIO()
+    im.save(output, format= 'PNG')
+    contents = output.getvalue()
+    output.close()
+
+    return contents

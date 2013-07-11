@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Results Summary{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/demo_table.css') }}">
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row-fluid">
+	<div class="form-box span10 offset1">
+  <div class="form-legend">Previous Comparisons</div>
+
+  <table id="resultsTable" class="table table-bordered table-striped" cellpadding="0" cellspacing="0" border="0">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>When</th>
+      <th>Who</th>
+    </tr>
+    </thead>
+    <tbody>
+      {% for result in results %}
+        <tr>
+          <td>{{ result.id }}</td>
+          <td><a href="{{ url_for('results.show_result', comparison_id=result.id) }}">{{ result }}</a></td>
+          <td>{{ result.baseline.comparison_operation }}</td>
+          <td>{{ result.timestamp }}</td>
+          <td></td>
+        </tr>
+      {% endfor %}
+
+  </table>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+
+{% endblock %}

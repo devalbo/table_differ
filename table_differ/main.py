@@ -16,7 +16,7 @@ import td_config
 import td_parsers
 import td_persist
 import td_comparison
-import td_thumbnail
+# import td_thumbnail
 
 from admin import admin
 from api import api
