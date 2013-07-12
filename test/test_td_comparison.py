@@ -188,5 +188,9 @@ class TestTdComparison(unittest.TestCase):
         self.assertEqual(0, len(comparison.actual_table_only_cells))
 
 
+    def test_updating_expected_to_actual(self):
+        self.assertFalse(True)
+
+
 if __name__ == "__main__":
     unittest.main()

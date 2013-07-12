@@ -13,6 +13,9 @@ class TdTable:
             v = unicode(v)
         return v
 
+    def set_value(self, row_index, col_index, new_value):
+        self._rows[row_index][col_index] = new_value
+
     @property
     def row_count(self):
         return len(self._rows)

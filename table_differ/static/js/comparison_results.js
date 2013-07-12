@@ -31,12 +31,38 @@ $container.handsontable({
               if (key === 'ignore') {
                 setTimeout(function () {
                   //timeout is used to make sure the menu collapsed before alert is shown
-                  alert("Will add code to ignore cell value");
+                  var selected = handsontable.getSelected();
+                  alert("Selected cells: " + selected);
                 }, 100);
               } else if (key === 'use_actual') {
                 setTimeout(function () {
                   //timeout is used to make sure the menu collapsed before alert is shown
-                  alert("Will add code to expect actual value");
+                  var selected = handsontable.getSelected();
+                  alert("Selected cells: " + selected);
+                  var updateAction = {update_type: "use_actual_in_region",
+                                      update_args: {
+                                          region: selected
+                                      } };
+
+                  $.ajax({
+                      url: update_result_grid_data_url,
+                      data: JSON.stringify(updateAction), //returns all cells' data
+                      dataType: 'json',
+                      contentType: 'application/json',
+                      type: 'POST',
+                      success: function (data, textStatus) {
+                        //alert(textStatus);
+                        if (data.redirect_url) {
+                            // data.redirect contains the string URL to redirect to
+                            window.location.href = data.redirect_url;
+                        }
+                      },
+                      error: function (data, textStatus) {
+                        alert(JSON.stringify(data));
+                        $console.text('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
+                      }
+                  });
+
                 }, 100);
               }
             },
@@ -61,7 +87,7 @@ $(document).ready( function() {
 function updateTableContents() {
 
 	$.ajax({
-        url: "/results/data/" + comparison_id,
+        url: result_grid_data_url,
         dataType: 'json',
 	    contentType: 'application/json',
 	    type: 'GET',

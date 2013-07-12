@@ -1,5 +1,5 @@
 
-var dataTableIds = ["dataTable1", "dataTable2"];
+var dataTableIds = ["expectedTable", "actualTable"];
 var handsonDataTables = [];
 for (var i = 0; i < dataTableIds.length; i++) {
 	var data = [
@@ -15,60 +15,8 @@ for (var i = 0; i < dataTableIds.length; i++) {
 		startCols: 8,
 		minSpareRows: 1,
 		minSpareCols: 1,
-		contextMenu:
-				{
-					callback: function (key, options) {
-					  if (key === 'ignore') {
-						setTimeout(function () {
-						  //timeout is used to make sure the menu collapsed before alert is shown
-						  alert("Will add code to call back to td_persist");
-						}, 100);
-					  }
-					},
-					items: {
-						"ignore": {name: 'Ignore Cell Differences'},
-						"hsep": "---------",
-						"row_above": {},
-						"row_below": {},
-						"hsep1": "---------",
-						"col_left": {},
-						"col_right": {},
-						"hsep2": "---------",
-						"remove_row": {},
-						"remove_col": {},
-						"hsep3": "---------",
-						"undo": {},
-						"redo": {}
-					}
-				}
 	});
 	handsonDataTables[i] = $(dataTableJqueryId).data('handsontable');
-//    $('#dataTable1 table').addClass('table');
-//    $('#dataTable2 table').addClass('table');
-}
-
-function post_to_url(path, params, method) {
-    method = method || "post"; // Set method to post by default, if not specified.
-
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
-    var form = document.createElement("form");
-    form.setAttribute("method", method);
-    form.setAttribute("action", path);
-
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-         }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
 }
 
 $('#compare').click(function() {
@@ -108,19 +56,12 @@ $('#compare').click(function() {
 		//alert(textStatus);
 		if (data.redirect_url) {
             // data.redirect contains the string URL to redirect to
-			//alert("Redirect to " + data.redirect_url);
             window.location.href = data.redirect_url;
         }
         else {
             // data.form contains the HTML for the replacement form
             $("#myform").replaceWith(data.form);
         }
-		//if (res.result === 'ok') {
-		//  $console.text('Data saved');
-		//}
-		//else {
-		//  $console.text('Save error');
-		//}
 	  },
 	  error: function (data, textStatus) {
 	    alert(JSON.stringify(data));

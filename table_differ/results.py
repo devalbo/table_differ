@@ -1,7 +1,7 @@
 
 import pickle, StringIO
 from flask import Blueprint, render_template, abort, request, url_for, Markup, send_file, jsonify
-import td_config, td_persist
+import td_config, td_comparison
 from app import app
 import models
 
@@ -90,8 +90,8 @@ def show_result(comparison_id):
                            comparison_id=comparison_id,
                            baseline_id=baseline_id)
 
-@blueprint.route('/data/<comparison_id>')
-def show_new_results_data(comparison_id):
+@blueprint.route('/<comparison_id>/results-grid-data')
+def view_results_grid_data(comparison_id):
     cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
     comparison = pickle.loads(cr.pickled_comparison_report)
 
@@ -132,6 +132,20 @@ def show_new_results_data(comparison_id):
                 }
     return jsonify(response)
 
+@blueprint.route('/<comparison_id>/results-grid-data', methods=['POST'])
+def update_results_grid_data(comparison_id):
+    cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
+    update_action = request.json['update_type']
+    update_args = request.json['update_args']
+
+    updated_items = td_comparison.do_results_update(cr, update_action, update_args)
+    if updated_items:
+        for i in updated_items:
+            i.save()
+
+    return ""
+
+
 @blueprint.route('/thumbnails/<comparison_id>')
 def thumbnails(comparison_id):
     img = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id).comparison_image
@@ -142,3 +156,5 @@ def thumbnails(comparison_id):
     return send_file(strIO,
                      attachment_filename="comparison-overview-%s.png" % comparison_id,
                      as_attachment=True)
+
+

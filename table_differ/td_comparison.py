@@ -5,6 +5,13 @@ import td_thumbnail
 COMPARE_LITERAL = "Literal"
 COMPARE_RE_SKIP = "Regular Expression"
 
+_UPDATE_TYPES = {}
+
+def update_method(update_type_name):
+    def wrapper(func):
+        _UPDATE_TYPES[update_type_name] = func
+        return func
+    return wrapper
 
 def compare_tables(t1, t2, comparator):
     comparison = TdComparison(t1, t2)
@@ -182,7 +189,7 @@ def do_baseline_comparison(actual_results_table,
     return comparison_result.id
 
 
-def do_adhoc_comparison(table1, table2, comparator,
+def do_adhoc_comparison(actual_table, expected_table, comparator,
                         baseline_name="New baseline",
                         baseline_description="Ad hoc comparison"):
 
@@ -204,11 +211,33 @@ def do_adhoc_comparison(table1, table2, comparator,
         )
     baseline = models.Baseline.create(
         name=baseline_name,
-        pickled_expected_table=pickle.dumps(table2),
+        pickled_expected_table=pickle.dumps(expected_table),
         comparison_operation=literal_compare,
         last_modified=now,
         created=now,
         source=baseline_source,
         )
 
-    return do_baseline_comparison(table1, baseline.id)
+    return do_baseline_comparison(actual_table, baseline.id)
+
+
+def do_results_update(comparison_result, update_type, update_args):
+    update_type_method = _UPDATE_TYPES[update_type]
+    return update_type_method(comparison_result, update_args)
+
+@update_method("use_actual_in_region")
+def do_use_actual_in_region(comparison_result, update_args):
+    start_row, start_col, end_row, end_col = update_args["region"]
+    cell_indices = [(row_index, col_index)
+                    for row_index in range(start_row, end_row + 1)
+                    for col_index in range(start_col, end_col + 1)]
+    actual_table = pickle.loads(comparison_result.pickled_actual_table)
+    baseline = comparison_result.baseline
+    expected_table = pickle.loads(comparison_result.baseline.pickled_expected_table)
+
+    for (cell_x, cell_y) in cell_indices:
+        new_value = actual_table.get_value(cell_x, cell_y)
+        expected_table.set_value(cell_x, cell_y, new_value)
+
+    baseline.pickled_expected_table = pickle.dumps(expected_table)
+    return (baseline, )

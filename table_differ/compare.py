@@ -17,9 +17,9 @@ def copy_paste_compare():
         return render_template('tables_input.html',
                                header_tab_classes={'copy-paste-compare': 'active'})
 
-    table1 = td_parsers.load_table_from_handson_json(request.json['dataTable1'])
-    table2 = td_parsers.load_table_from_handson_json(request.json['dataTable2'])
-    comparison_id = td_comparison.do_adhoc_comparison(table1, table2, td_comparison.COMPARE_LITERAL,
+    actual_table = td_parsers.load_table_from_handson_json(request.json['actualTable'])
+    expected_table = td_parsers.load_table_from_handson_json(request.json['expectedTable'])
+    comparison_id = td_comparison.do_adhoc_comparison(actual_table, expected_table, td_comparison.COMPARE_LITERAL,
                                                       "Quick compare at %s" % datetime.datetime.now())
 
     redirect_url = url_for('results.show_result',

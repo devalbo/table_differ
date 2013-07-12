@@ -8,6 +8,8 @@
 <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='css/jquery.handsontable.full.css') }}">
 <script src="http://handsontable.com/lib/jquery-ui/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript">
+  var result_grid_data_url = "{{ url_for('results.view_results_grid_data', comparison_id=comparison_id) }}"
+  var update_result_grid_data_url = "{{ url_for('results.update_results_grid_data', comparison_id=comparison_id) }}";
   var comparison_id = "{{ comparison_id }}";
 </script>
 {% endblock %}
@@ -22,7 +24,7 @@
         <li><a href="#summary" data-toggle="tab">Summary</a></li>
         <li><a href="#thumbnail" data-toggle="tab">Overview</a></li>
         <li><a href="#results" data-toggle="tab">Table</a></li>
-        <li class="active"><a href="#results-grid" data-toggle="tab">Grid</a></li>
+        <li class="active"><a href="#results-panel" data-toggle="tab">Grid</a></li>
       </ul>
 
       <div id="myTabContent" class="tab-content">
@@ -64,14 +66,13 @@
             <img src="{{ url_for('results.thumbnails', comparison_id=comparison_id) }}"/>
           </ul>
         </div>
-        <div class="tab-pane fade in active" id="results-grid">
+        <div class="tab-pane fade in active" id="results-panel">
+          <div class="control-group">
+            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
+          </div>
 					<div class="controls">
             <div id="results-grid" class="handsontable"></div>
 					</div>
-          <div class="control-group">
-{#            <label class="control-label">Edit baseline table</label>#}
-            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
-          </div>
         </div>
       </div>
     </div>
