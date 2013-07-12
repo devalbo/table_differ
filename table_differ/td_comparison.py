@@ -163,8 +163,8 @@ def do_baseline_comparison(actual_results_table,
     expected_results_table = pickle.loads(baseline.pickled_expected_table)
     comparison_type = baseline.comparison_operation.name
 
-    comparison = compare_tables(actual_results_table,
-                                expected_results_table,
+    comparison = compare_tables(expected_results_table,
+                                actual_results_table,
                                 comparison_type)
     try:
         thumbnail_img = td_thumbnail.create_comparison_image(comparison)
