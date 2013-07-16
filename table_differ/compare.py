@@ -19,8 +19,10 @@ def copy_paste_compare():
 
     actual_table = td_parsers.load_table_from_handson_json(request.json['actualTable'])
     expected_table = td_parsers.load_table_from_handson_json(request.json['expectedTable'])
-    comparison_id = td_comparison.do_adhoc_comparison(actual_table, expected_table, td_comparison.COMPARE_LITERAL,
-                                                      "Quick compare at %s" % datetime.datetime.now())
+    comparison_id = do_adhoc_comparison(actual_table,
+                                        expected_table,
+                                        td_comparison.COMPARE_LITERAL,
+                                        "Quick compare at %s" % datetime.datetime.now())
 
     redirect_url = url_for('results.show_result',
                            comparison_id=comparison_id)
@@ -44,7 +46,9 @@ def xls_worksheet_compare():
         expected_results_table = td_parsers.load_table_from_xls(file_location, expected_worksheet_name)
         actual_results_table = td_parsers.load_table_from_xls(file_location, actual_worksheet_name)
 
-        comparison_id = _do_adhoc_comparison(expected_results_table, actual_results_table, td_comparison.COMPARE_RE_SKIP)
+        comparison_id = td_comparison.do_adhoc_comparison(expected_results_table,
+                                                          actual_results_table,
+                                                          td_comparison.COMPARE_RE_SKIP)
 
         redirect_url = url_for('results.show_result',
                                comparison_id=comparison_id)
@@ -66,9 +70,10 @@ def quick_compare():
     expected_results_table = td_parsers.load_table_from_xls(baseline_file)
     actual_results_table = td_parsers.load_table_from_xls(actual_file)
 
-
-    comparison_operation = models.ComparisonOperation.CHOICES_DICT[int(request.form['comparison_type'])]
-    comparison_id = td_comparison.do_adhoc_comparison(expected_results_table, actual_results_table, comparison_operation)
+    comparison_operation = models.ComparisonOperation.OPS_DICT[int(request.form['comparison_type'])]
+    comparison_id = do_adhoc_comparison(expected_results_table,
+                                        actual_results_table,
+                                        comparison_operation)
 
     redirect_url = url_for('results.show_result',
                            comparison_id=comparison_id)
@@ -84,3 +89,59 @@ def compare_baseline_view(baseline_id):
     redirect_url = url_for('baselines.compare_baseline', baseline_id=baseline_id)
     return redirect(redirect_url)
 
+def do_baseline_comparison(actual_results_table,
+                           baseline_id,
+                           timestamp=datetime.datetime.now(),
+                           description="Baseline comparison"):
+
+    baseline = models.Baseline.get(models.Baseline.id == baseline_id)
+    expected_results_table = pickle.loads(baseline.pickled_expected_table)
+    comparison_type = baseline.comparison_operation.name
+
+    comparison = td_comparison.compare_tables(expected_results_table,
+                                              actual_results_table,
+                                              comparison_type)
+    try:
+        thumbnail_img = td_thumbnail.create_comparison_image(comparison)
+    except NameError, e:
+        thumbnail_img = ""
+
+    comparison_result = models.ComparisonResult.create(
+        pickled_actual_table=pickle.dumps(actual_results_table),
+        baseline=baseline,
+        comparison_image=thumbnail_img,
+        pickled_comparison_report=pickle.dumps(comparison),
+        timestamp=timestamp,
+        )
+
+    return comparison_result.id
+
+
+def do_adhoc_comparison(actual_table, expected_table, comparator,
+                        baseline_name="New baseline",
+                        baseline_description="Ad hoc comparison"):
+
+    now = datetime.datetime.now()
+
+    if comparator == td_comparison.COMPARE_LITERAL:
+        comparison_type = 0
+    elif comparator == td_comparison.COMPARE_RE_SKIP:
+        comparison_type = 1
+    else:
+        raise Exception("No such comparator: %s" % comparator)
+
+    literal_compare = models.create_comparison_operation(comparison_type)
+    baseline_source = models.BaselineSource.create(
+        adhoc=True,
+        description=baseline_description,
+        )
+    baseline = models.Baseline.create(
+        name=baseline_name,
+        pickled_expected_table=pickle.dumps(expected_table),
+        comparison_operation=literal_compare,
+        last_modified=now,
+        created=now,
+        source=baseline_source,
+        )
+
+    return do_baseline_comparison(actual_table, baseline.id)

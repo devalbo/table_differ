@@ -28,43 +28,31 @@ $container.handsontable({
     contextMenu:
         {
             callback: function (key, options) {
+              var updateAction = null;
               if (key === 'ignore') {
                 setTimeout(function () {
                   //timeout is used to make sure the menu collapsed before alert is shown
                   var selected = handsontable.getSelected();
-                  alert("Selected cells: " + selected);
+//                  alert("Selected cells: " + selected);
+                  updateAction = {update_type: "ignore_cells_in_region",
+                                  update_args: {
+                                      region: selected
+                                  } };
+                  postUpdateAction(updateAction);
                 }, 100);
               } else if (key === 'use_actual') {
                 setTimeout(function () {
                   //timeout is used to make sure the menu collapsed before alert is shown
                   var selected = handsontable.getSelected();
-                  alert("Selected cells: " + selected);
-                  var updateAction = {update_type: "use_actual_in_region",
-                                      update_args: {
-                                          region: selected
-                                      } };
-
-                  $.ajax({
-                      url: update_result_grid_data_url,
-                      data: JSON.stringify(updateAction), //returns all cells' data
-                      dataType: 'json',
-                      contentType: 'application/json',
-                      type: 'POST',
-                      success: function (data, textStatus) {
-                        //alert(textStatus);
-                        if (data.redirect_url) {
-                            // data.redirect contains the string URL to redirect to
-                            window.location.href = data.redirect_url;
-                        }
-                      },
-                      error: function (data, textStatus) {
-                        alert(JSON.stringify(data));
-                        $console.text('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
-                      }
-                  });
-
+//                  alert("Selected cells: " + selected);
+                  updateAction = {update_type: "use_actual_in_region",
+                                  update_args: {
+                                      region: selected
+                                  } };
+                  postUpdateAction(updateAction);
                 }, 100);
               }
+
             },
             items: {
                 "use_actual": {name: 'Set Expected to Actual'},
@@ -100,4 +88,27 @@ function updateTableContents() {
 	}).fail(function() {
 		alert('failure :(');
 	});
+}
+
+function postUpdateAction(updateAction) {
+  if (updateAction != null) {
+    $.ajax({
+      url: update_result_grid_data_url,
+      data: JSON.stringify(updateAction), //returns all cells' data
+      dataType: 'json',
+      contentType: 'application/json',
+      type: 'POST',
+      success: function (data, textStatus) {
+        if (data.redirect_url) {
+            // data.redirect contains the string URL to redirect to
+            window.location.href = data.redirect_url;
+        }
+      },
+      error: function (data, textStatus) {
+        alert(JSON.stringify(data));
+        $console.text('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
+      }
+    });
+  }
+
 }

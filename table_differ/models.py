@@ -8,26 +8,48 @@ from peewee import *
 
 from app import db
 
-class User(db.Model, BaseUser):
-    username = CharField()
-    password = CharField()
-    email = CharField()
-    join_date = DateTimeField(default=datetime.datetime.now)
-    active = BooleanField(default=True)
-    admin = BooleanField(default=False)
 
-    def __unicode__(self):
-        return self.username
+import collections
+_COMPARISON_OPERATIONS = collections.OrderedDict()
+
+def comparison_operation(cls):
+    _COMPARISON_OPERATIONS[cls.comparison_name] = cls
+    return cls
+
+@comparison_operation
+class LiteralComparisonOperation:
+    comparison_name = "Literal"
+
+    def __init__(self):
+        self.cells_to_ignore = []
+
+    def ignore_cells(self, cell_coord_list):
+        for cell in cell_coord_list:
+            if cell not in self.cells_to_ignore:
+                print "Ignoring", cell
+                self.cells_to_ignore.append(cell)
+
+
+@comparison_operation
+class RegExComparisonOperation:
+    comparison_name = "Regular Expression"
+
+    def __init__(self):
+        self.cells_to_ignore = []
+
+    def ignore_cells(self, cell_coord_list):
+        for cell in cell_coord_list:
+            if cell not in self.cells_to_ignore:
+                self.cells_to_ignore.append(cell)
 
 class ComparisonOperation(db.Model):
 
-    CHOICES_DICT = {0: "Literal",
-                    1: "Regular Expression",
-                    }
-    # CHOICES = (OrderedDict(sorted(CHOICES_DICT.items(), key=lambda t: t[0])))
-    CHOICES = OrderedDict(sorted(CHOICES_DICT.items(), key=lambda t: t[0]))
+    OPS = [(i, k) for i, k in enumerate(_COMPARISON_OPERATIONS.keys())]
+    OPS_DICT = dict(choice for choice in OPS)
+    CHOICES = OrderedDict(sorted(OPS_DICT.items(), key=lambda t: t[0]))
 
     type = IntegerField(choices=[(k, CHOICES[k]) for k in CHOICES.keys()])
+    pickled_comparison_op = BlobField()
 
     @property
     def name(self):
@@ -38,6 +60,41 @@ class ComparisonOperation(db.Model):
 
     def __str__(self):
         return self.CHOICES[self.type]
+
+    # @property
+    # def comparison_op(self):
+    #     ret_val = pickle.loads(self.pickled_comparison_op)
+    #     return ret_val
+    #
+    # @comparison_op.setter
+    # def set_comparison_op(self, value):
+    #     pickled_value = pickle.dumps(value)
+    #     self.pickled_comparison_op = pickled_value
+
+
+def create_comparison_operation(comp_type):
+    comp_type_name = ComparisonOperation.CHOICES[comp_type]
+    comp_instance_class = _COMPARISON_OPERATIONS[comp_type_name]
+    comp_instance = comp_instance_class()
+
+    comparison_operation = ComparisonOperation.create(
+        type=comp_type,
+        pickled_comparison_op=pickle.dumps(comp_instance),
+    )
+
+    return comparison_operation
+
+
+class User(db.Model, BaseUser):
+    username = CharField()
+    password = CharField()
+    email = CharField()
+    join_date = DateTimeField(default=datetime.datetime.now)
+    active = BooleanField(default=True)
+    admin = BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.username
 
 class BaselineSource(db.Model):
     adhoc = BooleanField()
@@ -52,7 +109,7 @@ class Baseline(db.Model):
     comparison_operation = ForeignKeyField(ComparisonOperation)
     last_modified = DateTimeField()
     created = DateTimeField()
-    source = ForeignKeyField(BaselineSource, related_name="bs_baseline")
+    source = ForeignKeyField(BaselineSource)
 
     def __unicode__(self):
         return self.name
@@ -61,36 +118,8 @@ class ComparisonResult(db.Model):
     pickled_actual_table = BlobField()
     pickled_comparison_report = BlobField()
     comparison_image = BlobField()
-    baseline = ForeignKeyField(Baseline, cascade=True)
+    baseline = ForeignKeyField(Baseline)
     timestamp = DateTimeField()
-
-    # @property
-    # def actual_table(self):
-    #     return pickle.loads(self.actual_table)
-    #
-    # @actual_table.setter
-    # def actual_table(self, value):
-    #     self.actual_table = pickle.dumps(value)
-    #
-    # @property
-    # def comparison_report(self):
-    #     return pickle.loads(self.comparison_report)
-    #
-    # @comparison_report.setter
-    # def comparison_report(self, value):
-    #     self.comparison_report = pickle.dumps(value)
-    #
-    # @property
-    # def comparison_image(self):
-    #     return pickle.loads(self.comparison_image)
-    #
-    # @comparison_image.setter
-    # def comparison_image_blob(self, value):
-    #     self.comparison_image = pickle.dumps(value)
 
     def __unicode__(self):
         return "%s comparison - performed at %s" % (self.baseline.comparison_operation, self.timestamp)
-
-    # def delete_instance(self, recursive=False, delete_nullable=False):
-    #     print "Deleting comparison result!", recursive
-    #     return super(ComparisonResult, self).delete_instance(recursive, delete_nullable)

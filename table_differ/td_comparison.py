@@ -1,6 +1,4 @@
-import re, pickle, datetime
-import models
-import td_thumbnail
+import re, pickle
 
 COMPARE_LITERAL = "Literal"
 COMPARE_RE_SKIP = "Regular Expression"
@@ -160,67 +158,6 @@ class TdComparison:
         self._actual_table_only_cells = actual_table_only_cells
         self._neither_table_cell_coords = neither_table_cell_coords
 
-
-def do_baseline_comparison(actual_results_table,
-                           baseline_id,
-                           timestamp=datetime.datetime.now(),
-                           description="Baseline comparison"):
-
-    baseline = models.Baseline.get(models.Baseline.id == baseline_id)
-    expected_results_table = pickle.loads(baseline.pickled_expected_table)
-    comparison_type = baseline.comparison_operation.name
-
-    comparison = compare_tables(expected_results_table,
-                                actual_results_table,
-                                comparison_type)
-    try:
-        thumbnail_img = td_thumbnail.create_comparison_image(comparison)
-    except NameError, e:
-        thumbnail_img = ""
-
-    comparison_result = models.ComparisonResult.create(
-        pickled_actual_table=pickle.dumps(actual_results_table),
-        baseline=baseline,
-        comparison_image=thumbnail_img,
-        pickled_comparison_report=pickle.dumps(comparison),
-        timestamp=timestamp,
-        )
-
-    return comparison_result.id
-
-
-def do_adhoc_comparison(actual_table, expected_table, comparator,
-                        baseline_name="New baseline",
-                        baseline_description="Ad hoc comparison"):
-
-    now = datetime.datetime.now()
-
-    if comparator == COMPARE_LITERAL:
-        comparison_type = 0
-    elif comparator == COMPARE_RE_SKIP:
-        comparison_type = 1
-    else:
-        raise Exception("No such comparator: %s" % comparator)
-
-    literal_compare = models.ComparisonOperation.create(
-        type=comparison_type,
-    )
-    baseline_source = models.BaselineSource.create(
-        adhoc=True,
-        description=baseline_description,
-        )
-    baseline = models.Baseline.create(
-        name=baseline_name,
-        pickled_expected_table=pickle.dumps(expected_table),
-        comparison_operation=literal_compare,
-        last_modified=now,
-        created=now,
-        source=baseline_source,
-        )
-
-    return do_baseline_comparison(actual_table, baseline.id)
-
-
 def do_results_update(comparison_result, update_type, update_args):
     update_type_method = _UPDATE_TYPES[update_type]
     return update_type_method(comparison_result, update_args)
@@ -241,3 +178,17 @@ def do_use_actual_in_region(comparison_result, update_args):
 
     baseline.pickled_expected_table = pickle.dumps(expected_table)
     return (baseline, )
+
+@update_method("ignore_cells_in_region")
+def do_ignore_cells_in_region(comparison_result, update_args):
+    start_row, start_col, end_row, end_col = update_args["region"]
+    cell_indices = [(row_index, col_index)
+                    for row_index in range(start_row, end_row + 1)
+                    for col_index in range(start_col, end_col + 1)]
+
+    comparison_op = pickle.loads(comparison_result.baseline.comparison_operation.pickled_comparison_op)
+    comparison_op.ignore_cells(cell_indices)
+    comparison_result.baseline.comparison_operation.pickled_comparison_op = pickle.dumps(comparison_op)
+
+    return (comparison_result.baseline.comparison_operation, )
+
