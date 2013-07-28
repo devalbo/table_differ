@@ -16,23 +16,13 @@ blueprint = Blueprint('baselines', __name__,
                       template_folder='templates')
 
 # View all baselines
-@blueprint.route('/', methods=['GET', 'POST'])
+@blueprint.route('/')
 def list_baselines():
     baselines = models.Baseline.select()
-    if request.method == 'GET':
-        return render_template('list_baselines.html',
-                               header_tab_classes={'manage-baseline': 'active'},
-                               baselines=baselines,
-                               )
-
-    # If there are files in the request, store them.
-    if request.method == 'POST':
-        baseline_file = td_persist.save_excel_file(request.files['baseline_file'], 'baselines')
-        baseline_record = models.OldBaseline.create(
-            name=request.form['baseline_name'],
-            file=baseline_file.id,
-            comparison=1
-        )
+    return render_template('list_baselines.html',
+                           header_tab_classes={'manage-baseline': 'active'},
+                           baselines=baselines,
+                           )
 
     return redirect(url_for('list_baselines'))
 
@@ -53,29 +43,16 @@ def view_baseline(baseline_id):
 @blueprint.route('/<int:baseline_id>', methods=['POST'])
 def update_baseline(baseline_id):
     baseline = models.Baseline.get(models.Baseline.id == baseline_id)
-    # if baselines.count() == 0:
-    #     return display_error('There are no baselines on the server. Please upload a baseline first.')
 
     baseline_name = request.json['baselineName']
     comparison_type = int(request.json['comparisonType'])
     table_data = td_parsers.load_table_from_handson_json(request.json['table'])
     comparison_classes = request.json['comparison_classes']
 
-    # cell_comparison_type = -1
-    # for k, v in models.CellComparison.CHOICES.items():
-    #     if cell_comparison_name == v:
-    #         cell_comparison_type = k
-    # cell_comparison_name = cell_comparisons.CHOICES[comparison_type]
-
-    # baseline.pickled_expected_table = pickle.dumps(table_data)
-    # cell_comparison_class = cell_comparisons.get_comparison_class_for_type(comparison_type)
-    # new_td_baseline_grid = td_baseline.make_baseline_grid_from_table(table_data, cell_comparison_class)
     new_td_baseline_grid = make_baseline_from_table_and_comparison_classes(table_data, comparison_classes)
 
     baseline.pickled_td_baseline_grid = pickle.dumps(new_td_baseline_grid)
     baseline.name = baseline_name
-    # baseline.comparison_operation.type = int(comparison_type)
-    # baseline.comparison_operation.save()
     baseline.default_cell_comparison_type = comparison_type
     baseline.save()
 
@@ -98,14 +75,6 @@ def upload_baseline():
         if len(baseline_name) < 1:
             baseline_name = "File upload at %s" % now
 
-        # comparison_operation = models.ComparisonOperation.create(
-        #     type=comparison_operation,
-        # )
-
-        # baseline_source = models.BaselineSource.create(
-        #     adhoc=False,
-        #     description="Uploaded by user on %s" % now,
-        #     )
         table_comparison = table_comparisons.RowByRowTableComparison()
 
         baseline = models.Baseline.create(

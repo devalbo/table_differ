@@ -8,8 +8,6 @@ from PIL import Image, ImageDraw
 # except ImportError, e:
 #     print "PIL module isn't available - thumbnail/image results won't be supported"
 
-from app import app
-
 
 def create_comparison_image(comparison):
 

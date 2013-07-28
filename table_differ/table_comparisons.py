@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from table_differ import new_td_comparison
+from table_differ import td_comparison
 
 _TABLE_COMPARISONS = OrderedDict()
 
@@ -52,7 +52,7 @@ class RowByRowTableComparison:
                 elif not baseline_cell_found and not actual_table_cell_found:
                     neither_table_cell_coords.append((row_index, col_index))
 
-        comparison_result = new_td_comparison.TdComparison(baseline_grid, actual_table)
+        comparison_result = td_comparison.TdComparison(baseline_grid, actual_table)
         comparison_result._same_cells = sames
         comparison_result._diff_cells = diffs
         comparison_result._expected_table_only_cells = baseline_grid_only_cells

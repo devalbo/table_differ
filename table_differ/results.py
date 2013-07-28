@@ -1,9 +1,7 @@
 
 import pickle, StringIO
-# import jsonpickle, StringIO
-from flask import Blueprint, render_template, abort, request, url_for, Markup, send_file, jsonify
+from flask import Blueprint, render_template, request, Markup, send_file, jsonify
 import td_config, td_comparison
-from app import app
 import models
 
 blueprint = Blueprint('results', __name__,

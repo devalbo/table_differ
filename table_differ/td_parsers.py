@@ -23,10 +23,6 @@ def load_table_from_handson_json(handson_json):
     for row in table_rows:
         t.add_row(row)
 
-    # table_info = {"row_count": row_count,
-    #               "col_count": col_count}
-
-    #return table_info, table_rows, t
     return t
 
 def load_table_from_xls(filename, worksheet_name=""):
