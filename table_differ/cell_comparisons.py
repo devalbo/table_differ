@@ -63,17 +63,17 @@ class IgnoreDifferencesComparison:
         return True
 
 
-# @cell_comparison
-# class NumberToleranceCellComparison:
-#     comparison_name = "Numeric Comparison w/ Tolerance"
-#     comparison_class = "compare-tolerance"
-#
-#     def __init__(self, baseline_value, tolerance=0.5):
-#         self._baseline_value = baseline_value
-#         self._tolerance = abs(tolerance)
-#
-#     def do_compare(self, cmp_value):
-#         return self._baseline_value - self._tolerance <= cmp_value <= self._baseline_value + self._tolerance
+@cell_comparison
+class NumberToleranceCellComparison:
+    comparison_name = "Numeric Comparison w/ Tolerance"
+    comparison_class = "compare-tolerance"
+
+    def __init__(self, baseline_value, tolerance=0.5):
+        self._baseline_value = baseline_value
+        self._tolerance = abs(tolerance)
+
+    def do_compare(self, cmp_value):
+        return self._baseline_value - self._tolerance <= cmp_value <= self._baseline_value + self._tolerance
 
 
 def get_constructor_for_comparison_class(comparison_class):

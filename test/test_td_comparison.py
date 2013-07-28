@@ -1,9 +1,12 @@
 __author__ = 'ajboehmler'
 
-import sys, os
+import sys
+
+import os
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from table_differ import td_table, td_comparison
+from table_differ import td_comparison, td_table
 import unittest
 
 
@@ -181,7 +184,6 @@ class TestTdComparison(unittest.TestCase):
         comparison.do_comparison(td_comparison.COMPARE_RE_SKIP)
 
         self.assertFalse(comparison.tables_equivalent)
-        print comparison.diff_cells
         self.assertEqual(2, len(comparison.diff_cells))
         self.assertEqual(7, len(comparison.same_cells))
         self.assertEqual(0, len(comparison.expected_table_only_cells))
