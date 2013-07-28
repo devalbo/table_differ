@@ -9,10 +9,12 @@ from app import app
 import compare
 import baselines
 import results
+import downloads
 
 app.register_blueprint(compare.blueprint, url_prefix='/compare')
 app.register_blueprint(baselines.blueprint, url_prefix='/baselines')
 app.register_blueprint(results.blueprint, url_prefix='/results')
+app.register_blueprint(downloads.blueprint, url_prefix='/downloads')
 
 @app.route('/')
 def index():

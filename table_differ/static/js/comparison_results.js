@@ -33,7 +33,6 @@ $container.handsontable({
                 setTimeout(function () {
                   //timeout is used to make sure the menu collapsed before alert is shown
                   var selected = handsontable.getSelected();
-//                  alert("Selected cells: " + selected);
                   updateAction = {update_type: "ignore_cells_in_region",
                                   update_args: {
                                       region: selected
@@ -44,7 +43,6 @@ $container.handsontable({
                 setTimeout(function () {
                   //timeout is used to make sure the menu collapsed before alert is shown
                   var selected = handsontable.getSelected();
-//                  alert("Selected cells: " + selected);
                   updateAction = {update_type: "use_actual_in_region",
                                   update_args: {
                                       region: selected
@@ -55,8 +53,8 @@ $container.handsontable({
 
             },
             items: {
-                "use_actual": {name: 'Set Expected to Actual'},
-                "ignore": {name: 'Ignore Cell Differences'},
+                "use_actual": {name: 'Set Expected to Actual in Baseline'},
+                "ignore": {name: 'Ignore Cell Differences in Baseline'},
             }
         },
     cells: function (row, col, prop) {

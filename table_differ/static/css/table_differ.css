@@ -1,9 +1,9 @@
-.mismatch { background-color:red; color: white; }
-.ok { background-color:#33FF99; color: black; }
-.missing_expected { background-color: red; color: white; }
-.missing_actual { background-color: red; color: white; }
-.padding { background-color: white; color: white; }
-.unexpected { background-color: yellow; }
+/*.mismatch { background-color:red; color: white; }*/
+/*.ok { background-color:#33FF99; color: black; }*/
+/*.missing_expected { background-color: red; color: white; }*/
+/*.missing_actual { background-color: red; color: white; }*/
+/*.padding { background-color: white; color: white; }*/
+/*.unexpected { background-color: yellow; }*/
 
 div#page-content {
 	background-color: #fdfdfd;
@@ -109,6 +109,12 @@ td.missing_actual { background-color: red; color: white; }
 td.padding { background-color: white; color: white; }
 td.unexpected { background-color: yellow; }
 
-/*td.mismatch {*/
-    /*background: pink;*/
-/*}*/
+td.compare-literal { background-color: white; color: black; }
+td.compare-regex { background-color: yellow; color: black; }
+td.compare-ignore { background-color: green; color: black; }
+td.compare-tolerance { background-color: greenyellow; color: black; }
+
+label.compare-literal { background-color: white; color: black; }
+label.compare-regex { background-color: yellow; color: black; }
+label.compare-ignore { background-color: green; color: black; }
+label.compare-tolerance { background-color: greenyellow; color: black; }

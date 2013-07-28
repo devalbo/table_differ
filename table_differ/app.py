@@ -9,3 +9,7 @@ app.wsgi_app = reverseproxied.ReverseProxied(app.wsgi_app)
 
 db = Database(app)
 
+
+
+import cell_comparisons
+app.jinja_env.filters['css_for_comparison_type'] = cell_comparisons.css_for_comparison_type

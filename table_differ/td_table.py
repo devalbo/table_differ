@@ -1,4 +1,3 @@
-import unicodedata
 class TdTable:
 
     def __init__(self):
@@ -27,4 +26,11 @@ class TdTable:
     @property
     def rows(self):
         return self._rows
+
+
+def export_to_csv(t, file_location):
+    pass
+
+def create_from_csv(t):
+    pass
 

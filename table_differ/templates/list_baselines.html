@@ -29,7 +29,7 @@
         <tr>
           <td>{{ baseline.id }}</td>
           <td><a href="{{ url_for('baselines.view_baseline', baseline_id=baseline.id) }}">{{ baseline.name }}</a></td>
-          <td>{{ baseline.comparison_operation.name }}</td>
+          <td>{{ baseline.default_cell_comparison }}</td>
           <td>{{ baseline.last_modified}}</td>
           <td></td>
         </tr>

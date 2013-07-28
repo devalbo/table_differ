@@ -18,16 +18,18 @@ admin.set_password('admin')
 admin.save()
 
 # models.UploadedFile.create_table()
-models.BaselineSource.create_table()
 models.Baseline.create_table()
+# models.OldBaseline.create_table()
 models.ComparisonResult.create_table()
+# models.CellComparison.create_table()
+# models.TableComparison.create_table()
 # models.ActualTable.create_table()
 # models.ExpectedTable.create_table()
 # models.ComparisonReport.create_table()
 # models.ComparisonImage.create_table()
 
 # Create the comparison settings table.
-models.ComparisonOperation.create_table()
+# models.ComparisonOperation.create_table()
 # models.ComparisonType.create(name=models.ComparisonType.COMPARISON_TYPE_LITERAL)
 # models.ComparisonType.create(name=models.ComparisonType.COMPARISON_TYPE_REGEX)
-
+# models.CellComparison.create_table()

@@ -1,5 +1,6 @@
 
 import pickle, StringIO
+# import jsonpickle, StringIO
 from flask import Blueprint, render_template, abort, request, url_for, Markup, send_file, jsonify
 import td_config, td_comparison
 from app import app
@@ -23,17 +24,17 @@ def show_result(comparison_id):
 
     cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
     comparison = pickle.loads(cr.pickled_comparison_report)
-    expected_row_count = comparison.expected_table.row_count
+    baseline_grid_row_count = comparison.baseline_grid.row_count
     actual_row_count = comparison.actual_table.row_count
-    if expected_row_count != actual_row_count:
-        report_note = "Error - different numbers of rows (Expected: %s / Actual: %s)" % (expected_row_count,
+    if baseline_grid_row_count != actual_row_count:
+        report_note = "Error - different numbers of rows (Expected: %s / Actual: %s)" % (baseline_grid_row_count,
                                                                                          actual_row_count)
         report_notes.append(report_note)
 
-    expected_col_count = comparison.expected_table.col_count
+    baseline_grid_col_count = comparison.baseline_grid.col_count
     actual_col_count = comparison.actual_table.col_count
-    if expected_col_count != actual_col_count:
-        report_note = "Error - different numbers of columns (Expected: %s / Actual: %s)" % (expected_col_count,
+    if baseline_grid_col_count != actual_col_count:
+        report_note = "Error - different numbers of columns (Expected: %s / Actual: %s)" % (baseline_grid_col_count,
                                                                                             actual_col_count)
         report_notes.append(report_note)
 
@@ -46,8 +47,9 @@ def show_result(comparison_id):
     cd.sort()
     for cell in cd:
         report_notes.append("[%s,%s] Expected: %s Actual: %s" %
-                            (cell[0], cell[1],
-                             comparison.expected_table.get_value(cell[0], cell[1]),
+                            (cell[0],
+                             cell[1],
+                             comparison.baseline_grid.get_expected_value(cell[0], cell[1]),
                              comparison.actual_table.get_value(cell[0], cell[1])))
 
     if len(report_notes) == 0:

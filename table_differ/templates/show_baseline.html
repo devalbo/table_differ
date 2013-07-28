@@ -56,8 +56,8 @@
                 <label class="control-label">Comparison</label>
                 <div class="controls" id="comparisonTypes">
                   {% for comparison in comparison_operations %}
-                  <label class="radio-label">
-                    {% if baseline.comparison_operation.type == comparison %}
+                  <label class="radio-label {{ comparison|css_for_comparison_type }}">
+                    {% if baseline.default_cell_comparison_type == comparison %}
                       <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}" checked="checked">
                     {% else %}
                       <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}">
@@ -76,13 +76,12 @@
       </div>
     </div>
 
-
 	</div>
 </div>
 
 <script>
     var baseline_id = {{ baseline.id }};
 </script>
-<script src="{{ url_for('static', filename='js/test_sheet.js') }}"></script>
+<script src="{{ url_for('static', filename='js/show_baseline.js') }}"></script>
 
 {% endblock %}

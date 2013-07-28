@@ -1,9 +1,10 @@
 
 #import pydataframe
 import json
-from xlrd import open_workbook
-import td_table
 import csv
+from table_differ import td_table
+
+from xlrd import open_workbook
 
 
 def load_table_from_handson_json(handson_json):
@@ -37,7 +38,7 @@ def load_table_from_xls(filename, worksheet_name=""):
             for row_index in range(s.nrows):
                 new_row = []
                 for col_index in range(s.ncols):
-                    new_row.append(s.cell(row_index, col_index).value)
+                    new_row.append(unicode(s.cell(row_index, col_index).value))
                 t.add_row(new_row)
             return t
 

@@ -67,12 +67,15 @@
           </ul>
         </div>
         <div class="tab-pane fade in active" id="results-panel">
-          <div class="control-group">
-            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
-          </div>
-					<div class="controls">
+					<div class="control-group">
             <div id="results-grid" class="handsontable"></div>
 					</div>
+          <div class="controls">
+            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
+          </div>
+          <div class="controls">
+            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Download actual table file</a>
+          </div>
         </div>
       </div>
     </div>
