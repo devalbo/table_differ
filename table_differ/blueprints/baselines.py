@@ -3,10 +3,9 @@ import pickle
 
 from flask import Blueprint, render_template, request, url_for, jsonify, redirect
 import models
-import td_persist
+import compare
 import td_parsers
 import td_file
-import compare
 import table_comparisons
 import cell_comparisons
 import td_baseline
@@ -145,6 +144,20 @@ def get_baseline_grid_data(baseline_id):
                 "data": data,
                 "comparison_classes": comparison_classes}
     return jsonify(response)
+
+@blueprint.route('/<baseline_id>/baseline-grid-data', methods=['POST'])
+def update_baseline_data(baseline_id):
+    baseline = models.Baseline.get(models.Baseline.id == baseline_id)
+    update_action = request.json['update_type']
+    update_args = request.json['update_args']
+
+    updated_items = td_baseline.do_baseline_update(baseline, update_action, update_args)
+    if updated_items:
+        for i in updated_items:
+            i.save()
+
+    return jsonify({})
+
 
 def display_error(error_message):
     return render_template('error.html',

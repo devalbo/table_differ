@@ -94,6 +94,7 @@ COMPARISON_TYPE_TO_CSS_DICT = {
     0: "compare-literal",
     1: "compare-regex",
     2: "compare-ignore",
+    3: "compare-tolerance",
     }
 
 def css_for_comparison_type(comparison_type):

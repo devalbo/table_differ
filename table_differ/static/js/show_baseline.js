@@ -1,7 +1,6 @@
 
 var $container = $("#dataTable");
 var $console = $("#example1console");
-//var $parent = $container.parent();
 var comparison_classes = null;
 var comparison_data = null;
 
@@ -124,7 +123,7 @@ $('#baseline-id').change( function() {
 function updateBaselineContents() {
 
 	$.ajax({
-		url: "/baselines/" + baseline_id + "/data",
+		url: baseline_grid_data_url,
 	}).done(function(res, textStatus) {
 		if (res.data) {
             comparison_data = res.data;
@@ -190,8 +189,27 @@ $('#update').click(function() {
 	  },
 	  error: function (data, textStatus) {
 	    alert(JSON.stringify(data));
-		$console.text('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
 	  }
 	});
 
 });
+
+function postUpdateAction(updateAction) {
+  if (updateAction != null) {
+    $.ajax({
+      url: update_baseline_grid_data_url,
+      data: JSON.stringify(updateAction),
+      dataType: 'json',
+      contentType: 'application/json',
+      type: 'POST',
+      success: function (data, textStatus) {
+        updateBaselineContents();
+      },
+      error: function (data, textStatus) {
+        alert(JSON.stringify(data));
+          alert(textStatus)
+          updateBaselineContents();
+      }
+    });
+  }
+}

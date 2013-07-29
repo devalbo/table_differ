@@ -143,7 +143,7 @@ def update_results_grid_data(comparison_id):
         for i in updated_items:
             i.save()
 
-    return ""
+    return jsonify({})
 
 
 @blueprint.route('/thumbnails/<comparison_id>')

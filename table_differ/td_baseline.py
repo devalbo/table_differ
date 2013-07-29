@@ -1,4 +1,7 @@
 
+import pickle
+import cell_comparisons
+
 def make_baseline_grid_from_table(expected_table, cell_comparison_class):
     baseline_grid = TdBaselineGrid()
     for row in expected_table.rows:
@@ -47,3 +50,33 @@ class TdBaselineGrid:
     @property
     def rows(self):
         return self._rows
+
+
+_UPDATE_TYPES = {}
+
+def update_method(update_type_name):
+    def wrapper(func):
+        _UPDATE_TYPES[update_type_name] = func
+        return func
+    return wrapper
+
+def do_baseline_update(comparison_result, update_type, update_args):
+    update_type_method = _UPDATE_TYPES[update_type]
+    return update_type_method(comparison_result, update_args)
+
+@update_method("ignore_cells_in_region")
+def do_ignore_cells_in_region(baseline, update_args):
+    start_row, start_col, end_row, end_col = update_args["region"]
+    cell_indices = [(row_index, col_index)
+                    for row_index in range(start_row, end_row + 1)
+                    for col_index in range(start_col, end_col + 1)]
+
+    baseline_grid = pickle.loads(baseline.pickled_td_baseline_grid)
+
+    for (cell_x, cell_y) in cell_indices:
+        new_value = unicode(baseline_grid.get_cell_comparison(cell_x, cell_y))
+        new_cell_comparison = cell_comparisons.IgnoreDifferencesComparison(new_value)
+        baseline_grid.set_cell_comparison(cell_x, cell_y, new_cell_comparison)
+
+    baseline.pickled_td_baseline_grid = pickle.dumps(baseline_grid)
+    return (baseline, )

@@ -1,4 +1,5 @@
 import pickle
+import cell_comparisons
 
 COMPARE_LITERAL = "Literal"
 COMPARE_RE_SKIP = "Regular Expression"
@@ -97,13 +98,14 @@ def do_use_actual_in_region(comparison_result, update_args):
                     for col_index in range(start_col, end_col + 1)]
     actual_table = pickle.loads(comparison_result.pickled_actual_table)
     baseline = comparison_result.baseline
-    expected_table = pickle.loads(comparison_result.baseline.pickled_expected_table)
+    baseline_grid = pickle.loads(comparison_result.baseline.pickled_td_baseline_grid)
 
     for (cell_x, cell_y) in cell_indices:
         new_value = actual_table.get_value(cell_x, cell_y)
-        expected_table.set_value(cell_x, cell_y, new_value)
+        new_cell_comparison = cell_comparisons.LiteralCellComparison(new_value)
+        baseline_grid.set_cell_comparison(cell_x, cell_y, new_cell_comparison)
 
-    baseline.pickled_expected_table = pickle.dumps(expected_table)
+    baseline.pickled_td_baseline_grid = pickle.dumps(baseline_grid)
     return (baseline, )
 
 @update_method("ignore_cells_in_region")
@@ -113,8 +115,13 @@ def do_ignore_cells_in_region(comparison_result, update_args):
                     for row_index in range(start_row, end_row + 1)
                     for col_index in range(start_col, end_col + 1)]
 
-    comparison_op = pickle.loads(comparison_result.baseline.comparison_operation.pickled_comparison_op)
-    comparison_op.ignore_cells(cell_indices)
-    comparison_result.baseline.comparison_operation.pickled_comparison_op = pickle.dumps(comparison_op)
+    baseline = comparison_result.baseline
+    baseline_grid = pickle.loads(baseline.pickled_td_baseline_grid)
 
-    return (comparison_result.baseline.comparison_operation, )
+    for (cell_x, cell_y) in cell_indices:
+        new_value = unicode(baseline_grid.get_cell_comparison(cell_x, cell_y))
+        new_cell_comparison = cell_comparisons.IgnoreDifferencesComparison(new_value)
+        baseline_grid.set_cell_comparison(cell_x, cell_y, new_cell_comparison)
+
+    baseline.pickled_td_baseline_grid = pickle.dumps(baseline_grid)
+    return (baseline, )

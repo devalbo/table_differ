@@ -5,11 +5,7 @@ from flask import redirect
 from admin import admin
 from api import api
 from app import app
-
-import compare
-import baselines
-import results
-import downloads
+from table_differ.blueprints import baselines, compare, downloads, results
 
 app.register_blueprint(compare.blueprint, url_prefix='/compare')
 app.register_blueprint(baselines.blueprint, url_prefix='/baselines')

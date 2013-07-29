@@ -6,6 +6,10 @@
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery.handsontable.full.js') }}"></script>
 <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='css/jquery.handsontable.full.css') }}">
+<script type="text/javascript">
+  var baseline_grid_data_url = "{{ url_for('baselines.get_baseline_grid_data', baseline_id=baseline.id) }}"
+  var update_baseline_grid_data_url = "{{ url_for('baselines.update_baseline_data', baseline_id=baseline.id) }}";
+</script>
 {% endblock %}
 
 {% block page_content %}
@@ -57,6 +61,7 @@
                 <div class="controls" id="comparisonTypes">
                   {% for comparison in comparison_operations %}
                   <label class="radio-label {{ comparison|css_for_comparison_type }}">
+{#                    <label class="radio-label">#}
                     {% if baseline.default_cell_comparison_type == comparison %}
                       <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}" checked="checked">
                     {% else %}

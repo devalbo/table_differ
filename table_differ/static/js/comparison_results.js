@@ -1,6 +1,5 @@
 var $container = $("#results-grid");
 var $console = $("#example1console");
-var $parent = $container.parent();
 
 var comparison_results_data = null;
 
