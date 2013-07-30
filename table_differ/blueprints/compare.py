@@ -1,7 +1,11 @@
 
-import datetime, pickle
+import os
+import datetime, json
 from flask import Blueprint, render_template, request, url_for, jsonify, redirect
+from werkzeug import secure_filename
+
 import models, td_parsers, td_file, td_baseline, cell_comparisons, table_comparisons
+from app import app
 
 try:
     import td_thumbnail
@@ -12,6 +16,12 @@ except ImportError, e:
 blueprint = Blueprint('compare', __name__,
                       template_folder='templates')
 
+
+ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @blueprint.route('/copy-paste', methods=['GET', 'POST'])
 def copy_paste_compare():
@@ -91,17 +101,16 @@ def compare_baseline_view(baseline_id):
     redirect_url = url_for('baselines.compare_baseline', baseline_id=baseline_id)
     return redirect(redirect_url)
 
-def do_baseline_comparison(actual_results_table,
+def do_baseline_comparison(actual_table,
                            baseline_id,
                            timestamp=datetime.datetime.now(),
                            description="Baseline comparison"):
 
     baseline = models.Baseline.get(models.Baseline.id == baseline_id)
-    baseline_grid = pickle.loads(baseline.pickled_td_baseline_grid)
-    table_comparison = pickle.loads(baseline.pickled_td_table_comparison)
-    # comparison_type = baseline.default_cell_comparison
+    baseline_grid = td_baseline.make_baseline_grid_from_json(baseline.td_baseline_grid_json)
+    table_comparison = table_comparisons.create_comparison_from_json(baseline.td_table_comparison_json)
 
-    comparison = table_comparison.compare_table_to_baseline_grid(actual_results_table,
+    comparison = table_comparison.compare_table_to_baseline_grid(actual_table,
                                                                  baseline_grid)
     try:
         thumbnail_img = td_thumbnail.create_comparison_image(comparison)
@@ -109,8 +118,7 @@ def do_baseline_comparison(actual_results_table,
         thumbnail_img = ""
 
     comparison_result = models.ComparisonResult.create(
-        pickled_actual_table=pickle.dumps(actual_results_table),
-        pickled_comparison_report=pickle.dumps(comparison),
+        actual_table_csv=actual_table.to_csv_str(),
         baseline=baseline,
         comparison_image=thumbnail_img,
         timestamp=timestamp,
@@ -134,7 +142,7 @@ def make_baseline(expected_table,
         raise Exception("No such cell comparison name: %s" % cell_comparison_name)
 
     cell_comp_type_name = cell_comparisons.CHOICES[cell_comparison_type]
-    cell_comp_instance_class = cell_comparisons._CELL_COMPARISONS[cell_comp_type_name]
+    cell_comp_instance_class = cell_comparisons.CELL_COMPARISONS[cell_comp_type_name]
     baseline_grid = td_baseline.make_baseline_grid_from_table(expected_table, cell_comp_instance_class)
 
     table_comparison_type = -1
@@ -143,14 +151,14 @@ def make_baseline(expected_table,
             table_comparison_type = k
 
     table_comp_type_name = table_comparisons.CHOICES[table_comparison_type]
-    table_comp_instance_class = table_comparisons._TABLE_COMPARISONS[table_comp_type_name]
+    table_comp_instance_class = table_comparisons.TABLE_COMPARISONS[table_comp_type_name]
     table_comparison = table_comp_instance_class()
 
     baseline = models.Baseline.create(
         name=baseline_name,
         description=baseline_description,
-        pickled_td_baseline_grid=pickle.dumps(baseline_grid),
-        pickled_td_table_comparison=pickle.dumps(table_comparison),
+        td_baseline_grid_json=baseline_grid.to_json(),
+        td_table_comparison_json=json.dumps(table_comparisons.get_json_dict_for_comparison(table_comparison)),
         default_cell_comparison_type=cell_comparison_type,
         last_modified=now,
         created=now,

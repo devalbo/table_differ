@@ -1,16 +1,10 @@
-from collections import OrderedDict
-from table_differ import td_comparison
-
-_TABLE_COMPARISONS = OrderedDict()
-
-
-def table_comparison(cls):
-    _TABLE_COMPARISONS[cls.comparison_name] = cls
-    return cls
+from util import table_comparison
+import td_comparison
 
 @table_comparison
 class RowByRowTableComparison:
     comparison_name = "Row by row comparison"
+    persist_attributes = []
 
     def compare_table_to_baseline_grid(self, actual_table, baseline_grid):
         diffs = {}
@@ -60,17 +54,3 @@ class RowByRowTableComparison:
         comparison_result._neither_table_cell_coords = neither_table_cell_coords
 
         return comparison_result
-
-
-@table_comparison
-class ForeignKeyTableComparison:
-    comparison_name = "Foreign key comparison"
-
-    def compare_baseline_grid_to_table(self, actual_table, baseline_grid):
-        pass
-
-
-CHOICES = OrderedDict([(i, k) for i, k in enumerate(_TABLE_COMPARISONS.keys())])
-
-def get_comparison_class_for_type(cmp_type):
-    return _TABLE_COMPARISONS[CHOICES[cmp_type]]

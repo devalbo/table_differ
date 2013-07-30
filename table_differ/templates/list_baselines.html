@@ -19,9 +19,9 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
-      <th>Comparison</th>
+      <th>Default Comparison</th>
       <th>Last Modified</th>
-      <th>Who</th>
+{#      <th>Who</th>#}
     </tr>
     </thead>
     <tbody>
@@ -29,9 +29,9 @@
         <tr>
           <td>{{ baseline.id }}</td>
           <td><a href="{{ url_for('baselines.view_baseline', baseline_id=baseline.id) }}">{{ baseline.name }}</a></td>
-          <td>{{ baseline.default_cell_comparison }}</td>
-          <td>{{ baseline.last_modified}}</td>
-          <td></td>
+          <td>{{ baseline.default_cell_comparison_type|name_for_comparison_type }}</td>
+          <td>{{ baseline.last_modified.strftime('%Y-%m-%d %I:%M %p')}}</td>
+{#          <td></td>#}
         </tr>
       {% endfor %}
 

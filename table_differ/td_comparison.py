@@ -1,9 +1,5 @@
-import pickle
-import cell_comparisons
-
-COMPARE_LITERAL = "Literal"
-COMPARE_RE_SKIP = "Regular Expression"
-COMPARE_PRIMARY_KEY = "Primary Key (not implemented yet)"
+import td_baseline, td_table
+import cell_comparisons, table_comparisons
 
 class TdComparison:
 
@@ -15,8 +11,6 @@ class TdComparison:
         self._expected_table_only_cells = None
         self._actual_table_only_cells = None
         self._neither_table_cell_coords = None
-        self._comparison_notes = []
-        self._comparator = None
 
     @property
     def max_rows(self):
@@ -27,12 +21,20 @@ class TdComparison:
         return max(self._baseline_grid.col_count, self._actual_table.col_count)
 
     @property
-    def baseline_grid(self):
-        return self._baseline_grid
+    def baseline_grid_row_count(self):
+        return self._baseline_grid_row_count
 
     @property
-    def actual_table(self):
-        return self._actual_table
+    def baseline_grid_col_count(self):
+        return self._baseline_grid_col_count
+
+    @property
+    def actual_table_row_count(self):
+        return self._actual_table_row_count
+
+    @property
+    def actual_table_col_count(self):
+        return self._actual_table_col_count
 
     @property
     def diff_cells(self):
@@ -55,14 +57,7 @@ class TdComparison:
         return self._neither_table_cell_coords
 
     @property
-    def comparison_notes(self):
-        return self._comparison_notes
-
-    @property
     def tables_equivalent(self):
-        # if self._comparator is None:
-        #     raise Exception("No comparison performed yet")
-
         if len(self.diff_cells) > 0:
             return False
         if len(self.expected_table_only_cells) > 0:
@@ -75,6 +70,16 @@ class TdComparison:
                 return False
 
         return True
+
+
+def make_comparison_report(comparison_result):
+    baseline_grid = td_baseline.make_baseline_grid_from_json(comparison_result.baseline.td_baseline_grid_json)
+    actual_table = td_table.create_from_csv(comparison_result.actual_table_csv)
+    table_comparison = table_comparisons.create_comparison_from_json(comparison_result.baseline.td_table_comparison_json)
+
+    comparison = table_comparison.compare_table_to_baseline_grid(actual_table,
+                                                                 baseline_grid)
+    return comparison
 
 
 _UPDATE_TYPES = {}
@@ -96,16 +101,17 @@ def do_use_actual_in_region(comparison_result, update_args):
     cell_indices = [(row_index, col_index)
                     for row_index in range(start_row, end_row + 1)
                     for col_index in range(start_col, end_col + 1)]
-    actual_table = pickle.loads(comparison_result.pickled_actual_table)
+    actual_table = td_table.create_from_csv(comparison_result.actual_table_csv)
     baseline = comparison_result.baseline
-    baseline_grid = pickle.loads(comparison_result.baseline.pickled_td_baseline_grid)
+    baseline_grid = td_baseline.make_baseline_grid_from_json(comparison_result.baseline.td_baseline_grid_json)
+
 
     for (cell_x, cell_y) in cell_indices:
         new_value = actual_table.get_value(cell_x, cell_y)
         new_cell_comparison = cell_comparisons.LiteralCellComparison(new_value)
         baseline_grid.set_cell_comparison(cell_x, cell_y, new_cell_comparison)
 
-    baseline.pickled_td_baseline_grid = pickle.dumps(baseline_grid)
+    baseline.td_baseline_grid_json = baseline_grid.to_json()
     return (baseline, )
 
 @update_method("ignore_cells_in_region")
@@ -116,12 +122,13 @@ def do_ignore_cells_in_region(comparison_result, update_args):
                     for col_index in range(start_col, end_col + 1)]
 
     baseline = comparison_result.baseline
-    baseline_grid = pickle.loads(baseline.pickled_td_baseline_grid)
+    baseline_grid = td_baseline.make_baseline_grid_from_json(baseline.td_baseline_grid_json)
+
 
     for (cell_x, cell_y) in cell_indices:
         new_value = unicode(baseline_grid.get_cell_comparison(cell_x, cell_y))
         new_cell_comparison = cell_comparisons.IgnoreDifferencesComparison(new_value)
         baseline_grid.set_cell_comparison(cell_x, cell_y, new_cell_comparison)
 
-    baseline.pickled_td_baseline_grid = pickle.dumps(baseline_grid)
+    baseline.td_baseline_grid_json = baseline_grid.to_json()
     return (baseline, )

@@ -19,24 +19,13 @@ class User(db.Model, BaseUser):
     def __unicode__(self):
         return self.username
 
-class CellComparison(db.Model):
-    comparison_name = CharField()
-    configuration_json = CharField()
-    x_pos = IntegerField()
-    y_pos = IntegerField()
-
-
-class TableComparison(db.Model):
-    comparison_name = CharField()
-    configuration_json = CharField()
-
 
 class Baseline(db.Model):
     name = CharField()
     description = CharField()
     default_cell_comparison_type = IntegerField(choices=cell_comparisons.CHOICES)
-    pickled_td_baseline_grid = BlobField()
-    pickled_td_table_comparison = BlobField()
+    td_baseline_grid_json = TextField()
+    td_table_comparison_json = TextField()
 
     last_modified = DateTimeField()
     created = DateTimeField()
@@ -47,8 +36,7 @@ class Baseline(db.Model):
 
 
 class ComparisonResult(db.Model):
-    pickled_actual_table = BlobField()
-    pickled_comparison_report = BlobField()
+    actual_table_csv = TextField()
     comparison_image = BlobField()
     baseline = ForeignKeyField(Baseline)
     timestamp = DateTimeField()
@@ -56,4 +44,4 @@ class ComparisonResult(db.Model):
     def __unicode__(self):
         return "%s comparison - performed at %s" % (
             cell_comparisons.CHOICES[self.baseline.default_cell_comparison_type],
-            self.timestamp)
+            self.timestamp.strftime('%Y-%m-%d %I:%M %p'))

@@ -1,3 +1,7 @@
+
+import csv
+import StringIO
+
 class TdTable:
 
     def __init__(self):
@@ -27,10 +31,19 @@ class TdTable:
     def rows(self):
         return self._rows
 
+    def to_csv_str(self):
+        out_csv_str = StringIO.StringIO()
+        writer = csv.writer(out_csv_str)
+        for row in self.rows:
+            cells = [cell for cell in row]
+            writer.writerow(cells)
+        to_csv = out_csv_str.getvalue()
+        out_csv_str.close()
+        return to_csv
 
-def export_to_csv(t, file_location):
-    pass
-
-def create_from_csv(t):
-    pass
-
+def create_from_csv(csv_str):
+    in_csv_str = StringIO.StringIO(csv_str)
+    t = TdTable()
+    for row in csv.reader(in_csv_str):
+        t.add_row(row)
+    return t

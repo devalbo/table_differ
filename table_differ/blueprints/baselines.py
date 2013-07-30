@@ -1,5 +1,4 @@
 import datetime
-import pickle
 
 from flask import Blueprint, render_template, request, url_for, jsonify, redirect
 import models
@@ -29,13 +28,12 @@ def list_baselines():
 @blueprint.route('/<int:baseline_id>')
 def view_baseline(baseline_id):
     baseline = models.Baseline.get(models.Baseline.id == baseline_id)
-    comparison_operations = cell_comparisons.CHOICES
 
     return render_template('show_baseline.html',
                            header_tab_classes={'manage-baseline': 'active'},
                            baseline=baseline,
                            comparison=baseline.default_cell_comparison_type,
-                           comparison_operations=comparison_operations,
+                           cell_comparisons=cell_comparisons,
                            selected_baseline=baseline_id)
 
 # Manage a baseline with the specified baseline ID.
@@ -50,7 +48,7 @@ def update_baseline(baseline_id):
 
     new_td_baseline_grid = make_baseline_from_table_and_comparison_classes(table_data, comparison_classes)
 
-    baseline.pickled_td_baseline_grid = pickle.dumps(new_td_baseline_grid)
+    baseline.td_baseline_grid_json = new_td_baseline_grid.to_json()
     baseline.name = baseline_name
     baseline.default_cell_comparison_type = comparison_type
     baseline.save()
@@ -80,8 +78,8 @@ def upload_baseline():
             name=baseline_name,
             description="Uploaded by user on %s" % now,
             default_cell_comparison_type=comparison_operation,
-            pickled_td_baseline_grid=pickle.dumps(baseline_table),
-            pickled_td_table_comparison=pickle.dumps(table_comparison),
+            td_baseline_grid_json=baseline_table.to_json(),
+            td_table_comparison_json=table_comparisons.get_json_dict_for_comparison(table_comparison),
             last_modified=now,
             created=now,
             adhoc=False,
@@ -128,7 +126,7 @@ def compare_baseline(baseline_id):
 @blueprint.route('/<int:baseline_id>/data')
 def get_baseline_grid_data(baseline_id):
     baseline = models.Baseline.get(models.Baseline.id == baseline_id)
-    baseline_grid = pickle.loads(baseline.pickled_td_baseline_grid)
+    baseline_grid = td_baseline.make_baseline_grid_from_json(baseline.td_baseline_grid_json)
     data = []
     comparison_classes = []
     for row in baseline_grid.rows:

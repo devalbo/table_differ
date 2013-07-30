@@ -13,3 +13,4 @@ db = Database(app)
 
 import cell_comparisons
 app.jinja_env.filters['css_for_comparison_type'] = cell_comparisons.css_for_comparison_type
+app.jinja_env.filters['name_for_comparison_type'] = cell_comparisons.name_for_comparison_type

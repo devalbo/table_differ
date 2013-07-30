@@ -14,30 +14,26 @@ var compareRenderer = function (instance, td, row, col, prop, value, cellPropert
             td.className = "compare-literal";
         }
     }
-
 };
-
-function get_css_class_for_comparison_type(comparison_type) {
-    switch (comparison_type) {
-        case "0":
-            return "compare-literal";
-            break;
-        case "1":
-            return "compare-regex";
-            break;
-        case "2":
-            return "compare-ignore";
-            break;
-        default:
-            alert("Oops - invalid comparison type: " + comparison_type);
-    }
-
-}
 
 function get_default_class() {
     var selected = $("#comparisonTypes input[type='radio']:checked");
     var selectedValue = selected.val();
-    return get_css_class_for_comparison_type(selectedValue);
+    return cmp_type_to_css_class[selectedValue];
+}
+
+function do_cells_update(update_type) {
+    setTimeout(function () {
+      //timeout is used to make sure the menu collapsed before alert is shown
+      var selected = handsontable.getSelected();
+      var updateAction = {update_type: update_type,
+                          update_args: {
+                              region: selected
+                          }
+      };
+      postUpdateAction(updateAction);
+    }, 100);
+
 }
 
 $container.handsontable({
@@ -47,21 +43,17 @@ $container.handsontable({
     colHeaders: true,
     contextMenu: {
         callback: function (key, options) {
-          var updateAction = null;
-          if (key === 'ignore') {
-            setTimeout(function () {
-              //timeout is used to make sure the menu collapsed before alert is shown
-              var selected = handsontable.getSelected();
-              updateAction = {update_type: "ignore_cells_in_region",
-                              update_args: {
-                                  region: selected
-                              } };
-              postUpdateAction(updateAction);
-            }, 100);
+          if (key === 'ignore_cells_in_region' ||
+              key === 'literal_compare_cells_in_region' ||
+              key === 'regex_compare_cells_in_region')
+          {
+              do_cells_update(key);
           }
         },
         items: {
-            "ignore": {name: 'Ignore Differences'},
+            "ignore_cells_in_region": {name: 'Ignore Differences'},
+            "literal_compare_cells_in_region": {name: 'Do Literal Comparison'},
+            "regex_compare_cells_in_region": {name: 'Do Regular Expression Comparison'},
             "hsep1": "---------",
             "row_above": {},
             "row_below": {},
@@ -103,6 +95,17 @@ $container.handsontable({
             }
         }
 
+    },
+    afterChange: function(changes, source) {
+        if (changes != null) {
+            for (var i = 0; i < changes.length; i++) {
+                var change = changes[i];
+                var row = change[0];
+                var col = change[1];
+                var old_value = change[2];
+                var new_value = change[3];
+            }
+        }
     },
     cells: function (row, col, prop) {
         this.renderer = compareRenderer; //uses function directly

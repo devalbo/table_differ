@@ -21,7 +21,7 @@
       <th>Name</th>
       <th>Type</th>
       <th>When</th>
-      <th>Who</th>
+{#      <th>Who</th>#}
     </tr>
     </thead>
     <tbody>
@@ -29,9 +29,9 @@
         <tr>
           <td>{{ result.id }}</td>
           <td><a href="{{ url_for('results.show_result', comparison_id=result.id) }}">{{ result }}</a></td>
-          <td>{{ result.baseline.comparison_operation }}</td>
-          <td>{{ result.timestamp }}</td>
-          <td></td>
+          <td>{{ result.baseline.default_cell_comparison_type|name_for_comparison_type }}</td>
+          <td>{{ result.timestamp.strftime('%Y-%m-%d %I:%M %p') }}</td>
+{#          <td></td>#}
         </tr>
       {% endfor %}
 

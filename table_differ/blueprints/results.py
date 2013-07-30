@@ -1,7 +1,7 @@
 
-import pickle, StringIO
+import StringIO
 from flask import Blueprint, render_template, request, Markup, send_file, jsonify
-import td_config, td_comparison
+import td_config, td_comparison, td_baseline, table_comparisons, td_table
 import models
 
 blueprint = Blueprint('results', __name__,
@@ -21,16 +21,22 @@ def show_result(comparison_id):
     report_notes = []
 
     cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
-    comparison = pickle.loads(cr.pickled_comparison_report)
-    baseline_grid_row_count = comparison.baseline_grid.row_count
-    actual_row_count = comparison.actual_table.row_count
+    baseline_grid = td_baseline.make_baseline_grid_from_json(cr.baseline.td_baseline_grid_json)
+    actual_table = td_table.create_from_csv(cr.actual_table_csv)
+    table_comparison = table_comparisons.create_comparison_from_json(cr.baseline.td_table_comparison_json)
+
+    comparison = table_comparison.compare_table_to_baseline_grid(actual_table,
+                                                                 baseline_grid)
+
+    baseline_grid_row_count = baseline_grid.row_count
+    actual_row_count = actual_table.row_count
     if baseline_grid_row_count != actual_row_count:
         report_note = "Error - different numbers of rows (Expected: %s / Actual: %s)" % (baseline_grid_row_count,
                                                                                          actual_row_count)
         report_notes.append(report_note)
 
-    baseline_grid_col_count = comparison.baseline_grid.col_count
-    actual_col_count = comparison.actual_table.col_count
+    baseline_grid_col_count = baseline_grid.col_count
+    actual_col_count = actual_table.col_count
     if baseline_grid_col_count != actual_col_count:
         report_note = "Error - different numbers of columns (Expected: %s / Actual: %s)" % (baseline_grid_col_count,
                                                                                             actual_col_count)
@@ -47,8 +53,8 @@ def show_result(comparison_id):
         report_notes.append("[%s,%s] Expected: %s Actual: %s" %
                             (cell[0],
                              cell[1],
-                             comparison.baseline_grid.get_expected_value(cell[0], cell[1]),
-                             comparison.actual_table.get_value(cell[0], cell[1])))
+                             baseline_grid.get_expected_value(cell[0], cell[1]),
+                             actual_table.get_value(cell[0], cell[1])))
 
     if len(report_notes) == 0:
         report_notes.append("No differences between expected and actual tables")
@@ -93,7 +99,7 @@ def show_result(comparison_id):
 @blueprint.route('/<comparison_id>/results-grid-data')
 def view_results_grid_data(comparison_id):
     cr = models.ComparisonResult.get(models.ComparisonResult.id == comparison_id)
-    comparison = pickle.loads(cr.pickled_comparison_report)
+    comparison = td_comparison.make_comparison_report(cr)
 
     items = []
     item_styles = []
