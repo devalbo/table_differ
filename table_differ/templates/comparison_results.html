@@ -73,9 +73,9 @@
           <div class="controls">
             <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
           </div>
-{#          <div class="controls">#}
-{#            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Download actual table file</a>#}
-{#          </div>#}
+          <div class="controls">
+            <a href="{{ url_for('downloads.download_actual_table', comparison_id=comparison_id) }}">Download actual table file</a>
+          </div>
         </div>
       </div>
     </div>
