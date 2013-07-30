@@ -60,14 +60,14 @@
               <div class="control-group">
                 <label class="control-label">Comparison</label>
                 <div class="controls" id="comparisonTypes">
-                  {% for comparison in cell_comparisons.CHOICES %}
-                  <label class="radio-label {{ comparison|css_for_comparison_type }}">
-                    {% if baseline.default_cell_comparison_type == comparison %}
-                      <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}" checked="checked">
+                  {% for comparison_type, comparison_name in cell_comparisons.CHOICES %}
+                  <label class="radio-label {{ comparison_type|css_for_comparison_type }}">
+                    {% if baseline.default_cell_comparison_type == comparison_type %}
+                      <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}" checked="checked">
                     {% else %}
-                      <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}">
+                      <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}">
                     {% endif %}
-                    {{ cell_comparisons.CHOICES[comparison]|striptags|title }}
+                    {{ comparison_name|striptags|title }}
                   </label>
                   {% endfor %}
                 </div>

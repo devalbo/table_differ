@@ -1,17 +1,18 @@
 
 from collections import OrderedDict
 
-CELL_COMPARISONS = OrderedDict()
-CHOICES = OrderedDict()
+CHOICES = []
+CELL_COMPARISONS = {}
 IDS_TO_CHOICE_NAMES_DICT = {}
 COMPARISON_TYPE_TO_CSS_DICT = {}
 
 
 def cell_comparison(cls):
+    cmp_index = len(CELL_COMPARISONS)
     CELL_COMPARISONS[cls.comparison_name] = cls
-    CHOICES[len(CELL_COMPARISONS) - 1] = cls.comparison_name
-    IDS_TO_CHOICE_NAMES_DICT[cls.comparison_name] = len(CELL_COMPARISONS) - 1
-    COMPARISON_TYPE_TO_CSS_DICT[len(CELL_COMPARISONS) - 1] = cls.comparison_class
+    CHOICES.append((cmp_index, cls.comparison_name))
+    IDS_TO_CHOICE_NAMES_DICT[cls.comparison_name] = cmp_index
+    COMPARISON_TYPE_TO_CSS_DICT[cmp_index] = cls.comparison_class
     return cls
 
 
@@ -31,7 +32,7 @@ def css_for_comparison_type(comparison_type):
 
 
 def name_for_comparison_type(comparison_type):
-    return CHOICES[comparison_type]
+    return CHOICES[comparison_type][1]
 
 
 def get_json_dict_for_comparison(cmp):

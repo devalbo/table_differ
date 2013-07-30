@@ -74,12 +74,12 @@ def quick_compare():
     if request.method == 'GET':
         return render_template('quick_compare.html',
                                header_tab_classes={'quick-compare': 'active'},
-                               comparison_operations=cell_comparisons.CHOICES)
+                               cell_comparisons=cell_comparisons)
 
     baseline_file = td_file.save_excel_file(request.files['baseline_file'], 'actual')
     actual_file = td_file.save_excel_file(request.files['comparison_file'], 'actual')
 
-    comparison_operation = cell_comparisons.CHOICES[int(request.form['comparison_type'])]
+    comparison_operation = cell_comparisons.CHOICES[int(request.form['comparison_type'])][1]
     expected_results_table = td_parsers.load_table_from_xls(baseline_file)
     baseline = make_baseline(expected_results_table,
                              comparison_operation)
@@ -134,14 +134,14 @@ def make_baseline(expected_table,
     now = datetime.datetime.now()
 
     cell_comparison_type = -1
-    for k, v in cell_comparisons.CHOICES.items():
+    for k, v in cell_comparisons.CHOICES:
         if cell_comparison_name == v:
             cell_comparison_type = k
 
     if cell_comparison_type < 0:
         raise Exception("No such cell comparison name: %s" % cell_comparison_name)
 
-    cell_comp_type_name = cell_comparisons.CHOICES[cell_comparison_type]
+    cell_comp_type_name = cell_comparisons.CHOICES[cell_comparison_type][1]
     cell_comp_instance_class = cell_comparisons.CELL_COMPARISONS[cell_comp_type_name]
     baseline_grid = td_baseline.make_baseline_grid_from_table(expected_table, cell_comp_instance_class)
 
