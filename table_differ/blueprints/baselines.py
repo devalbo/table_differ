@@ -65,7 +65,7 @@ def upload_baseline():
         baseline_file = td_file.save_excel_file(request.files['baseline_file'], 'baselines')
         baseline_table = td_parsers.load_table_from_xls(baseline_file)
 
-        comparison_operation = int(request.form['comparison_type'])
+        comparison_operation = int(request.form['comparison_type_id'])
         comparison_class = cell_comparisons.IDS_TO_CMP_CLASS_DICT[comparison_operation]
         baseline_grid = td_baseline.make_baseline_grid_from_table(baseline_table, comparison_class)
 
