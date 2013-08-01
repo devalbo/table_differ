@@ -1,5 +1,7 @@
 __author__ = 'ajboehmler'
 
+import os, platform
+
 class Configuration(object):
     DATABASE = {
         'name': 'table_differ.db',
@@ -17,3 +19,11 @@ class Configuration(object):
 #     'user': 'table_differ',
 #     'password': 'table_differ',
 #     }
+
+    STORAGE_LOCATION = ""
+    if platform.system().startswith("Windows"):
+        STORAGE_LOCATION = 'C:\\table_differ'
+    else:
+        STORAGE_LOCATION = '/tmp/table_differ'
+
+    UPLOAD_FOLDER = os.path.join(STORAGE_LOCATION, 'uploads')
