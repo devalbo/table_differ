@@ -82,7 +82,7 @@ def upload_baseline():
             description="Uploaded by user on %s" % now,
             default_cell_comparison_type=comparison_operation,
             td_baseline_grid_json=baseline_grid.to_json(),
-            td_table_comparison_json=table_comparisons.get_json_dict_for_comparison(table_comparison),
+            td_table_comparison_json=table_comparisons.get_json_for_comparison(table_comparison),
             last_modified=now,
             created=now,
             adhoc=False,

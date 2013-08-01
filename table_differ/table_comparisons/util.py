@@ -29,7 +29,7 @@ def get_constructor_for_comparison_type(comparison_type_name):
     return None
 
 
-def get_json_dict_for_comparison(cmp):
+def get_json_for_comparison(cmp):
     attributes = {}
     for attribute in cmp.persist_attributes:
         attributes[attribute] = getattr(cmp, attribute)
@@ -38,8 +38,7 @@ def get_json_dict_for_comparison(cmp):
         "table_cmp_type": cmp.comparison_type_name,
         "table_cmp_attributes": attributes,
         }
-
-    return d
+    return json.dumps(d)
 
 
 def create_comparison_from_json(cmp_json):
