@@ -65,9 +65,12 @@ def upload_baseline():
         baseline_file = td_file.save_excel_file(request.files['baseline_file'], 'baselines')
         baseline_table = td_parsers.load_table_from_xls(baseline_file)
 
+        comparison_operation = int(request.form['comparison_type'])
+        comparison_class = cell_comparisons.IDS_TO_CMP_CLASS_DICT[comparison_operation]
+        baseline_grid = td_baseline.make_baseline_grid_from_table(baseline_table, comparison_class)
+
         now = datetime.datetime.now()
 
-        comparison_operation = int(request.form['comparison_type'])
         baseline_name = request.form['baseline_name'].strip()
         if len(baseline_name) < 1:
             baseline_name = "File upload at %s" % now
@@ -78,7 +81,7 @@ def upload_baseline():
             name=baseline_name,
             description="Uploaded by user on %s" % now,
             default_cell_comparison_type=comparison_operation,
-            td_baseline_grid_json=baseline_table.to_json(),
+            td_baseline_grid_json=baseline_grid.to_json(),
             td_table_comparison_json=table_comparisons.get_json_dict_for_comparison(table_comparison),
             last_modified=now,
             created=now,
@@ -91,7 +94,7 @@ def upload_baseline():
     # If there are no files present, display the upload page.
     return render_template('upload_baseline.html',
                            header_tab_classes={'upload-baseline': 'active'},
-                           comparison_operations=cell_comparisons.CHOICES)
+                           cell_comparisons=cell_comparisons)
 
 # Compare a file with an existing baseline.
 @blueprint.route('/compare', methods=['GET', 'POST'])
@@ -134,7 +137,7 @@ def get_baseline_grid_data(baseline_id):
         comparison_row = []
         for cell in row:
             data_row.append("%s" % cell)
-            comparison_row.append(cell.comparison_class)
+            comparison_row.append(cell.comparison_css_class)
         data.append(data_row)
         comparison_classes.append(comparison_row)
 

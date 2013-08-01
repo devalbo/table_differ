@@ -2,8 +2,10 @@ from util import cell_comparison
 
 @cell_comparison
 class NumberToleranceCellComparison:
-    comparison_name = "Numeric Comparison w/ Tolerance"
-    comparison_class = "compare-tolerance"
+    comparison_type_id = -1  # automatically assigned at startup
+    comparison_type_name = "cell.compare-tolerance"
+    comparison_css_class = "compare-tolerance"
+    comparison_label = "Numeric Comparison w/ Tolerance"
     persist_attributes = ["baseline_value", "tolerance"]
 
     def __init__(self, baseline_value, tolerance=0.5):

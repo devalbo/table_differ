@@ -28,12 +28,12 @@
 				<div class="control-group">
 					<label class="control-label">Comparison Type</label>
 					<div class="controls">
-						{% for comparison_type, comparison_name in cell_comparisons.CHOICES %}
+						{% for comparison_type, comparison_name in cell_comparisons.CHOICE_LABELS %}
 						<label class="radio-label {{ comparison_type|css_for_comparison_type }}">
-							{% if loop.index == 1 %}
-								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}" checked="checked">
+							{% if comparison_name == "Literal" %}
+								<input class="radio-button" type="radio" name="comparison_type_id" value="{{ comparison_type }}" checked="checked">
 							{% else %}
-								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}">
+								<input class="radio-button" type="radio" name="comparison_type_id" value="{{ comparison_type }}">
 							{% endif %}
 							{{ comparison_name|striptags|title }}
 						</label>

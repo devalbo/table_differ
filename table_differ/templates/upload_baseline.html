@@ -28,14 +28,14 @@
 				<div class="control-group">
 					<label class="control-label">Comparison Type</label>
 					<div class="controls">
-						{% for comparison in comparison_operations %}
+            {% for comparison_type, comparison_name in cell_comparisons.IDS_TO_CMP_NAME_DICT.items() %}
 						<label class="radio-label">
-							{% if loop.index == 1 %}
-								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}" checked="checked">
+							{% if comparison_name == "Literal" %}
+								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}" checked="checked">
 							{% else %}
-								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison }}">
+								<input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}">
 							{% endif %}
-							{{ comparison_operations[comparison]|striptags|title }}
+							{{ comparison_name|striptags|title }}
 						</label>
 						{% endfor %}
 					</div>

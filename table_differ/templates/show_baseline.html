@@ -9,7 +9,7 @@
 <script type="text/javascript">
   var baseline_grid_data_url = "{{ url_for('baselines.get_baseline_grid_data', baseline_id=baseline.id) }}"
   var update_baseline_grid_data_url = "{{ url_for('baselines.update_baseline_data', baseline_id=baseline.id) }}";
-  var cmp_type_to_css_class = {{ cell_comparisons.COMPARISON_TYPE_TO_CSS_DICT|tojson|safe }};
+  var cmp_type_to_css_class = {{ cell_comparisons.IDS_TO_CMP_CSS_DICT|tojson|safe }};
 </script>
 {% endblock %}
 
@@ -60,7 +60,7 @@
               <div class="control-group">
                 <label class="control-label">Default Comparison</label>
                 <div class="controls" id="comparisonTypes">
-                  {% for comparison_type, comparison_name in cell_comparisons.CHOICES %}
+                  {% for comparison_type, comparison_name in cell_comparisons.IDS_TO_CMP_LABEL_DICT.items() %}
                   <label class="radio-label {{ comparison_type|css_for_comparison_type }}">
                     {% if baseline.default_cell_comparison_type == comparison_type %}
                       <input class="radio-button" type="radio" name="comparison_type" value="{{ comparison_type }}" checked="checked">

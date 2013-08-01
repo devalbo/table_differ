@@ -23,7 +23,7 @@ class User(db.Model, BaseUser):
 class Baseline(db.Model):
     name = CharField()
     description = CharField()
-    default_cell_comparison_type = IntegerField(choices=cell_comparisons.CHOICES)
+    default_cell_comparison_type = IntegerField(choices=cell_comparisons.CHOICE_LABELS)
     td_baseline_grid_json = TextField()
     td_table_comparison_json = TextField()
 
@@ -43,5 +43,5 @@ class ComparisonResult(db.Model):
 
     def __unicode__(self):
         return "%s comparison - performed at %s" % (
-            cell_comparisons.CHOICES[self.baseline.default_cell_comparison_type],
+            cell_comparisons.IDS_TO_CMP_LABEL_DICT[self.baseline.default_cell_comparison_type],
             self.timestamp.strftime('%Y-%m-%d %I:%M %p'))

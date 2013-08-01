@@ -3,7 +3,9 @@ import td_comparison
 
 @table_comparison
 class RowByRowTableComparison:
-    comparison_name = "Row by row comparison"
+    comparison_type_id = -1  # automatically assigned at startup
+    comparison_type_name = "table.compare-rowbyrow"
+    comparison_label = "Row by row comparison"
     persist_attributes = []
 
     def compare_table_to_baseline_grid(self, actual_table, baseline_grid):

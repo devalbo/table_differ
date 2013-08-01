@@ -30,8 +30,10 @@ def copy_paste_compare():
                                header_tab_classes={'copy-paste-compare': 'active'})
 
     expected_table = td_parsers.load_table_from_handson_json(request.json['expectedTable'])
+    baseline_name = "Copy/paste comparison baseline @ %s" % datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
     baseline = make_baseline(expected_table,
-                             cell_comparisons.LiteralCellComparison.comparison_name)
+                             cell_comparisons.LiteralCellComparison.comparison_type_id,
+                             baseline_name=baseline_name)
 
     actual_table = td_parsers.load_table_from_handson_json(request.json['actualTable'])
     comparison = do_baseline_comparison(actual_table, baseline.id)
@@ -40,7 +42,7 @@ def copy_paste_compare():
                            comparison_id=comparison.id)
     return jsonify(redirect_url=redirect_url)
 
-@blueprint.route('/xls-worksheet', methods=['GET', 'POST'])
+@blueprint.route('/actref-file', methods=['GET', 'POST'])
 def xls_worksheet_compare():
     if request.method == 'GET':
         return render_template('xls_worksheet_compare.html',
@@ -69,7 +71,7 @@ def xls_worksheet_compare():
     return redirect(url_for('compare.xls_worksheet_compare'))
 
 # Perform a quick comparison between two Excel files.
-@blueprint.route('/quick', methods=['GET', 'POST'])
+@blueprint.route('/file-file', methods=['GET', 'POST'])
 def quick_compare():
     if request.method == 'GET':
         return render_template('quick_compare.html',
@@ -79,10 +81,13 @@ def quick_compare():
     baseline_file = td_file.save_excel_file(request.files['baseline_file'], 'actual')
     actual_file = td_file.save_excel_file(request.files['comparison_file'], 'actual')
 
-    comparison_operation = cell_comparisons.CHOICES[int(request.form['comparison_type'])][1]
+    comparison_type_id = int(request.form['comparison_type_id'])
     expected_results_table = td_parsers.load_table_from_xls(baseline_file)
+    baseline_name = "File comparison baseline @ %s" % datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
+
     baseline = make_baseline(expected_results_table,
-                             comparison_operation)
+                             comparison_type_id,
+                             baseline_name=baseline_name)
 
     actual_results_table = td_parsers.load_table_from_xls(actual_file)
     comparison = do_baseline_comparison(actual_results_table, baseline.id)
@@ -127,31 +132,30 @@ def do_baseline_comparison(actual_table,
     return comparison_result
 
 def make_baseline(expected_table,
-                  cell_comparison_name,
-                  table_comparison_name="Row by row comparison",
+                  cell_comparison_type,
+                  table_comparison_type_id=table_comparisons.RowByRowTableComparison.comparison_type_id,
                   baseline_name="New baseline",
                   baseline_description="Ad hoc comparison"):
     now = datetime.datetime.now()
 
-    cell_comparison_type = -1
-    for k, v in cell_comparisons.CHOICES:
-        if cell_comparison_name == v:
-            cell_comparison_type = k
+    # cell_comparison_type = -1
+    # for k, v in cell_comparisons.:
+    #     if cell_comparison_type == v:
+    #         cell_comparison_type = k
+    #
+    # if cell_comparison_type < 0:
+    #     raise Exception("No such cell comparison type: %s" % cell_comparison_name)
 
-    if cell_comparison_type < 0:
-        raise Exception("No such cell comparison name: %s" % cell_comparison_name)
-
-    cell_comp_type_name = cell_comparisons.CHOICES[cell_comparison_type][1]
-    cell_comp_instance_class = cell_comparisons.CELL_COMPARISONS[cell_comp_type_name]
+    # cell_comp_type_name = cell_comparisons.CHOICES[cell_comparison_type][1]
+    cell_comp_instance_class = cell_comparisons.CELL_COMPARISONS[cell_comparison_type]
     baseline_grid = td_baseline.make_baseline_grid_from_table(expected_table, cell_comp_instance_class)
 
-    table_comparison_type = -1
-    for k, v in table_comparisons.CHOICES.items():
-        if table_comparison_name == v:
-            table_comparison_type = k
+    # table_comparison_type = -1
+    # for k, v in table_comparisons.CHOICES:
+    #     if table_comparison_name == v:
+    #         table_comparison_type = k
 
-    table_comp_type_name = table_comparisons.CHOICES[table_comparison_type]
-    table_comp_instance_class = table_comparisons.TABLE_COMPARISONS[table_comp_type_name]
+    table_comp_instance_class = table_comparisons.TABLE_COMPARISONS[table_comparison_type_id]
     table_comparison = table_comp_instance_class()
 
     baseline = models.Baseline.create(
