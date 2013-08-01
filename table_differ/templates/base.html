@@ -29,14 +29,14 @@
                 <ul class="nav nav-tabs">
                   <li class="{{ header_tab_classes['copy-paste-compare'] }}"><a href="{{ url_for('compare.copy_paste_compare') }}">Copy/Paste Compare</a></li>
                   <li class="{{ header_tab_classes['quick-compare'] }}"><a href="{{ url_for('compare.quick_compare') }}">Quick Compare</a></li>
-                  <li class="dropdown">
+                  <li class="dropdown {{ header_tab_classes['compare-baseline'] }} {{ header_tab_classes['xls-worksheet-compare'] }}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Comparisons<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li class="{{ header_tab_classes['compare-baseline'] }}"><a href="{{ url_for('compare.compare_baseline') }}">Baseline Compare</a></li>
                       <li class="{{ header_tab_classes['xls-worksheet-compare'] }}"><a href="{{ url_for('compare.xls_worksheet_compare') }}">Ref/Act Compare</a></li>
                     </ul>
                   </li>
-                  <li class="dropdown">
+                  <li class="dropdown {{ header_tab_classes['manage-baseline'] }} {{ header_tab_classes['upload-baseline'] }}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Baselines<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li class="{{ header_tab_classes['compare-baseline'] }}"><a href="{{ url_for('baselines.compare_baselines') }}">Compare to Baseline</a></li>
