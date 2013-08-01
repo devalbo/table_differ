@@ -1,4 +1,6 @@
 
+import sys
+
 from flask import url_for
 from flask import redirect
 
@@ -6,6 +8,11 @@ from admin import admin
 from api import api
 from app import app
 from table_differ.blueprints import baselines, compare, downloads, results
+
+import cell_comparisons
+app.jinja_env.filters['css_for_comparison_type'] = cell_comparisons.css_for_comparison_type
+app.jinja_env.filters['name_for_comparison_type'] = cell_comparisons.name_for_comparison_type
+
 
 app.register_blueprint(compare.blueprint, url_prefix='/compare')
 app.register_blueprint(baselines.blueprint, url_prefix='/baselines')

@@ -42,3 +42,4 @@ table_differ/compare_results/
 # Development files/directories
 venv
 *.db
+prod_config.py

@@ -36,30 +36,32 @@
           </ul>
         </div>
         <div class="tab-pane fade" id="results">
-          <table border="1">
-            {% if options.show_row_col_labels %}
-              <tr>
-                  <td/>
-                  {% for cell in table_rows[0] %}
-                  <td>{{ loop.index }}</td>
+          <ul>
+            <table border="1">
+              {% if options.show_row_col_labels %}
+                <tr>
+                    <td/>
+                    {% for cell in table_rows[0] %}
+                    <td>{{ loop.index }}</td>
+                    {% endfor %}
+                </tr>
+              {% endif %}
+
+              {% for row in table_rows %}
+                <tr>
+                  {% if options.show_row_col_labels %}
+                    <td>{{ loop.index }}</td>
+                  {% endif %}
+
+                  {% for cell in row %}
+                    <td class="{{ cell[1] }}">
+                      {{ cell[0] }}
+                    </td>
                   {% endfor %}
-              </tr>
-            {% endif %}
-
-            {% for row in table_rows %}
-              <tr>
-                {% if options.show_row_col_labels %}
-                  <td>{{ loop.index }}</td>
-                {% endif %}
-
-                {% for cell in row %}
-                  <td class="{{ cell[1] }}">
-                    {{ cell[0] }}
-                  </td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-          </table>
+                </tr>
+              {% endfor %}
+            </table>
+          </ul>
         </div>
         <div class="tab-pane fade" id="thumbnail">
           <ul>
@@ -67,16 +69,18 @@
           </ul>
         </div>
         <div class="tab-pane fade in active" id="results-panel">
-					<div class="control-group">
-            <div id="results-grid" class="handsontable"></div>
-					</div>
-          <div class="controls">
-            <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
-          </div>
-          <div class="controls">
-            <a href="{{ url_for('downloads.download_actual_table', comparison_id=comparison_id) }}">Download actual table file</a>
-          </div>
+          <ul>
+            <div class="control-group">
+              <div id="results-grid" class="handsontable"></div>
+            </div>
+          </ul>
         </div>
+      </div>
+      <div class="controls">
+        <a href="{{ url_for('baselines.view_baseline', baseline_id=baseline_id) }}">Edit baseline</a>
+      </div>
+      <div class="controls">
+        <a href="{{ url_for('downloads.download_actual_table', comparison_id=comparison_id) }}">Download actual table file</a>
       </div>
     </div>
   </div>

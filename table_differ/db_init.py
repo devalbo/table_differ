@@ -1,9 +1,9 @@
 __author__ = 'ajboehmler'
 
 import os
-import models, config
+import models, dev_config
 
-config_obj = config.Configuration()
+config_obj = dev_config.Configuration()
 sqlite_file = config_obj.DATABASE['name']
 if os.path.exists(sqlite_file):
     os.remove(sqlite_file)
