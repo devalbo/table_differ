@@ -62,8 +62,7 @@ def update_baseline(baseline_id):
 @blueprint.route('/upload', methods=['GET', 'POST'])
 def upload_baseline():
     if request.method == 'POST':
-        baseline_file = td_file.save_excel_file(request.files['baseline_file'], 'baselines')
-        baseline_table = td_parsers.load_table_from_xls(baseline_file)
+        baseline_table = td_file.load_table_from_file_upload(request.files['baseline_file'])
 
         comparison_operation = int(request.form['comparison_type_id'])
         comparison_class = cell_comparisons.IDS_TO_CMP_CLASS_DICT[comparison_operation]
@@ -116,8 +115,7 @@ def compare_baseline(baseline_id):
                                baselines=baselines,
                                selected_baseline=baseline_id)
 
-    actual_file = td_file.save_excel_file(request.files['compare_file'], 'actual')
-    actual_results_table = td_parsers.load_table_from_xls(actual_file)
+    actual_results_table = td_file.load_table_from_file_upload(request.files['compare_file'])
 
     comparison = compare.do_baseline_comparison(actual_results_table,
                                                 baseline_id)

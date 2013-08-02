@@ -78,18 +78,15 @@ def quick_compare():
                                header_tab_classes={'quick-compare': 'active'},
                                cell_comparisons=cell_comparisons)
 
-    baseline_file = td_file.save_excel_file(request.files['baseline_file'], 'actual')
-    actual_file = td_file.save_excel_file(request.files['comparison_file'], 'actual')
-
+    expected_results_table = td_file.load_table_from_file_upload(request.files['baseline_file'])
     comparison_type_id = int(request.form['comparison_type_id'])
-    expected_results_table = td_parsers.load_table_from_xls(baseline_file)
     baseline_name = "File comparison baseline @ %s" % datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
 
     baseline = make_baseline(expected_results_table,
                              comparison_type_id,
                              baseline_name=baseline_name)
 
-    actual_results_table = td_parsers.load_table_from_xls(actual_file)
+    actual_results_table = td_file.load_table_from_file_upload(request.files['comparison_file'])
     comparison = do_baseline_comparison(actual_results_table, baseline.id)
 
     redirect_url = url_for('results.show_result',
