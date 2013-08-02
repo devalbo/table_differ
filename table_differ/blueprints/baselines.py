@@ -72,7 +72,7 @@ def upload_baseline():
 
         baseline_name = request.form['baseline_name'].strip()
         if len(baseline_name) < 1:
-            baseline_name = "File upload at %s" % now
+            baseline_name = "File upload at %s" % now.strftime('%Y-%m-%d %I:%M %p')
 
         table_comparison = table_comparisons.RowByRowTableComparison()
 
