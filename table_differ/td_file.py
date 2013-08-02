@@ -11,12 +11,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-def get_excel_file_path(file_id):
-    file_record = models.UploadedFile.get(models.UploadedFile.id == file_id)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_record.directory, file_record.name)
-    return file_path
-
-
 def save_excel_file(file, directory):
     if file and allowed_file(file.filename):
         filename = "%s.%s" % (uuid.uuid4(), file.filename.split('.')[-1])
