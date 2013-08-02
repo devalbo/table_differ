@@ -169,7 +169,7 @@ def make_baseline_from_table_and_comparison_classes(table, comparison_classes):
     for value_row, class_row in zip(table.rows, comparison_classes):
         cmp_row = []
         for cell_value, cell_class in zip(value_row, class_row):
-            cell_comparison_class = cell_comparisons.get_constructor_for_comparison_class(cell_class)
+            cell_comparison_class = cell_comparisons.get_constructor_for_comparison_css_class(cell_class)
             cmp = cell_comparison_class(cell_value)
             cmp_row.append(cmp)
         baseline_grid.add_row(cmp_row)

@@ -28,6 +28,13 @@ def get_constructor_for_comparison_type(comparison_type_name):
     return None
 
 
+def get_constructor_for_comparison_css_class(comparison_class):
+    for v in CELL_COMPARISONS.values():
+        if v.comparison_css_class == comparison_class:
+            return v
+    return None
+
+
 def css_for_comparison_type(comparison_type):
     return IDS_TO_CMP_CSS_DICT[comparison_type]
 
