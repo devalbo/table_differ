@@ -1,6 +1,7 @@
 
 import os
-import datetime, json
+import datetime
+import zlib
 from flask import Blueprint, render_template, request, url_for, jsonify, redirect
 from werkzeug import secure_filename
 
@@ -103,6 +104,7 @@ def compare_baseline_view(baseline_id):
     redirect_url = url_for('baselines.compare_baseline', baseline_id=baseline_id)
     return redirect(redirect_url)
 
+
 def do_baseline_comparison(actual_table,
                            baseline_id,
                            timestamp=datetime.datetime.now(),
@@ -120,7 +122,7 @@ def do_baseline_comparison(actual_table,
         thumbnail_img = ""
 
     comparison_result = models.ComparisonResult.create(
-        actual_table_csv=actual_table.to_csv_str(),
+        actual_table_csv_zipped=zlib.compress(actual_table.to_csv_str()),
         baseline=baseline,
         comparison_image=thumbnail_img,
         timestamp=timestamp,
@@ -135,22 +137,8 @@ def make_baseline(expected_table,
                   baseline_description="Ad hoc comparison"):
     now = datetime.datetime.now()
 
-    # cell_comparison_type = -1
-    # for k, v in cell_comparisons.:
-    #     if cell_comparison_type == v:
-    #         cell_comparison_type = k
-    #
-    # if cell_comparison_type < 0:
-    #     raise Exception("No such cell comparison type: %s" % cell_comparison_name)
-
-    # cell_comp_type_name = cell_comparisons.CHOICES[cell_comparison_type][1]
     cell_comp_instance_class = cell_comparisons.CELL_COMPARISONS[cell_comparison_type]
     baseline_grid = td_baseline.make_baseline_grid_from_table(expected_table, cell_comp_instance_class)
-
-    # table_comparison_type = -1
-    # for k, v in table_comparisons.CHOICES:
-    #     if table_comparison_name == v:
-    #         table_comparison_type = k
 
     table_comp_instance_class = table_comparisons.TABLE_COMPARISONS[table_comparison_type_id]
     table_comparison = table_comp_instance_class()
@@ -158,8 +146,8 @@ def make_baseline(expected_table,
     baseline = models.Baseline.create(
         name=baseline_name,
         description=baseline_description,
-        td_baseline_grid_json=baseline_grid.to_json(),
-        td_table_comparison_json=table_comparisons.get_json_for_comparison(table_comparison),
+        td_baseline_grid_json_zipped=zlib.compress(baseline_grid.to_json()),
+        td_table_comparison_json_zipped=zlib.compress(table_comparisons.get_json_for_comparison(table_comparison)),
         default_cell_comparison_type=cell_comparison_type,
         last_modified=now,
         created=now,
